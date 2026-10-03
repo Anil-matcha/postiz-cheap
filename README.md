@@ -1,7 +1,5 @@
 <div align="center">
 
-<a href="https://developers.openai.com/api/docs/guides/latest-model"><img src="images/banner.png" alt="Awesome Astra: GPT-6 Astra real use cases" width="760"></a>
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-lightgrey.svg)](LICENSE)
 [![OpenAI API](https://img.shields.io/badge/OpenAI_API-gpt--6--astra-412991)](https://developers.openai.com/api/docs/models)
 [![Model guide](https://img.shields.io/badge/Model_Guide-Read-635bff)](https://developers.openai.com/api/docs/guides/latest-model)
