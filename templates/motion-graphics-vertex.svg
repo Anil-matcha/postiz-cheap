@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="title desc">
+  <title id="title">Vertex — dynamic presentation title slide</title>
+  <desc id="desc">A polished Vertex story slide with layered gradients and subtle motion accents.</desc>
+  <defs>
+    <linearGradient id="bg-vertex" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#071a23"/>
+      <stop offset="0.55" stop-color="#0b1a34"/>
+      <stop offset="1" stop-color="#0a173d"/>
+    </linearGradient>
+    <radialGradient id="glow-vertex" cx="0.8" cy="0.22" r="0.82">
+      <stop offset="0" stop-color="#7ef2d5" stop-opacity="0.8"/>
+      <stop offset="0.35" stop-color="#4da8ff" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#7d7efc" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="line-vertex" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7ef2d5" stop-opacity="0"/>
+      <stop offset="0.32" stop-color="#7ef2d5"/>
+      <stop offset="0.7" stop-color="#4da8ff"/>
+      <stop offset="1" stop-color="#4da8ff" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="blur-vertex" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="46"/>
+    </filter>
+    <style>
+      text { font-family: Inter, ui-sans-serif, system-ui, "Segoe UI", sans-serif; }
+      .eyebrow { fill: #e3f7ff; font-size: 18px; letter-spacing: 7px; font-weight: 700; }
+      .headline { fill: #f8fbff; font-size: 112px; font-weight: 800; letter-spacing: -6px; }
+      .sub { fill: #e3f7ff; font-size: 28px; font-weight: 500; }
+      .reveal { opacity: 0; transform: translateY(22px); animation: reveal .95s cubic-bezier(.15,.7,.2,1) forwards; }
+      .d1 { animation-delay: .15s; } .d2 { animation-delay: .32s; } .d3 { animation-delay: .5s; }
+      .float { animation: float 9s ease-in-out infinite; }
+      .pulse { animation: pulse 4.8s ease-in-out infinite; }
+      @keyframes reveal { to { opacity: 1; transform: translateY(0); } }
+      @keyframes float { 50% { transform: translateY(-12px); } }
+      @keyframes pulse { 50% { transform: scale(1.08); opacity: .82; } }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+        .reveal { opacity: 1; transform: none; }
+      }
+    </style>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#bg-vertex)"/>
+  <circle cx="1325" cy="280" r="430" fill="url(#glow-vertex)" filter="url(#blur-vertex)"/>
+  <circle cx="1160" cy="220" r="170" fill="#4da8ff" opacity="0.18"/>
+  <path d="M210 242H1710" stroke="url(#line-vertex)" stroke-width="2" opacity="0.85"/>
+  <rect x="86" y="88" width="1748" height="904" rx="30" fill="none" stroke="rgba(255,255,255,0.16)"/>
+
+  <g class="reveal d1">
+    <text x="148" y="198" class="eyebrow">PRODUCT SYSTEMS</text>
+  </g>
+  <g class="reveal d2">
+    <text x="146" y="404" class="headline">Turn</text>
+    <text x="146" y="528" class="headline">complexity</text>
+    <text x="146" y="652" class="headline" fill="#7ef2d5">into velocity</text>
+  </g>
+  <g class="reveal d3">
+    <text x="148" y="744" class="sub">A confident framework slide built for architecture reviews, roadmap updates, and system walkthroughs.</text>
+  </g>
+
+  <g class="float">
+    <rect x="1300" y="240" width="440" height="520" rx="42" fill="#0d2237" stroke="#7ef2d5" stroke-opacity="0.56" stroke-width="2"/>
+    <rect x="1346" y="300" width="350" height="18" rx="9" fill="#4da8ff" opacity="0.7"/>
+    <rect x="1346" y="350" width="240" height="14" rx="7" fill="#ffffff" opacity="0.25"/>
+    <rect x="1346" y="390" width="180" height="14" rx="7" fill="#ffffff" opacity="0.2"/>
+    <rect x="1346" y="470" width="200" height="160" rx="26" fill="#7d7efc" opacity="0.15"/>
+    <rect x="1564" y="470" width="110" height="160" rx="26" fill="#7ef2d5" opacity="0.16"/>
+    <circle cx="1474" cy="580" r="36" fill="#7ef2d5" opacity="0.92" class="pulse"/>
+    <path d="M1449 582l24 24 42-53" fill="none" stroke="#0c1220" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M1346 690h204" stroke="#7ef2d5" stroke-opacity="0.7" stroke-width="10" stroke-linecap="round"/>
+  </g>
+
+  <g opacity="0.75">
+    <circle cx="504" cy="838" r="5" fill="#4da8ff"/>
+    <circle cx="620" cy="812" r="5" fill="#7d7efc"/>
+    <circle cx="718" cy="860" r="5" fill="#7ef2d5"/>
+    <circle cx="820" cy="806" r="5" fill="#4da8ff"/>
+  </g>
+</svg>

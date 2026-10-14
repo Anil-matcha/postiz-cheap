@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="title desc">
+  <title id="title">Launch — bold product announcement template</title>
+  <desc id="desc">A high-energy black and acid-green product launch slide with an animated device mockup and luminous design elements.</desc>
+  <defs>
+    <linearGradient id="lime" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#ddff70"/><stop offset="1" stop-color="#99ec5b"/>
+    </linearGradient>
+    <radialGradient id="flare">
+      <stop stop-color="#b8ff61" stop-opacity=".3"/><stop offset="1" stop-color="#b8ff61" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="52" height="52" patternUnits="userSpaceOnUse">
+      <path d="M52 0H0V52" fill="none" stroke="#c5ed91" stroke-opacity=".07"/>
+    </pattern>
+    <filter id="shadow" x="-40%" y="-30%" width="180%" height="180%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="24" result="blur"/>
+      <feOffset dy="20"/><feComponentTransfer><feFuncA type="linear" slope=".35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <style>
+      text { font-family: Inter, ui-sans-serif, system-ui, "Segoe UI", sans-serif; }
+      .label { fill: #c3cca9; font-size: 18px; font-weight: 680; letter-spacing: 5px; }
+      .headline { fill: #f7f8f2; font-size: 102px; font-weight: 780; letter-spacing: -7px; }
+      .small { fill: #c3cca9; font-size: 24px; }
+      .reveal { opacity: 0; transform: translateY(18px); animation: reveal .9s cubic-bezier(.2,.7,.2,1) forwards; }
+      .d1 { animation-delay: .15s; }.d2 { animation-delay: .3s; }
+      .device { transform-origin: 1425px 532px; animation: float 5.5s ease-in-out infinite; }
+      .scan { animation: scan 4s ease-in-out infinite; }
+      .spark { transform-origin: 1620px 282px; animation: twinkle 3s ease-in-out infinite; }
+      @keyframes reveal { to { opacity: 1; transform: translateY(0); } }
+      @keyframes float { 50% { transform: translateY(-14px) rotate(-1deg); } }
+      @keyframes scan { 50% { transform: translateX(430px); } }
+      @keyframes twinkle { 50% { transform: scale(.65); opacity: .4; } }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+        .reveal { opacity: 1; transform: none; }
+      }
+    </style>
+  </defs>
+  <rect width="1920" height="1080" fill="#10130e"/>
+  <rect width="1920" height="1080" fill="url(#grid)"/>
+  <ellipse cx="1438" cy="512" rx="480" ry="465" fill="url(#flare)"/>
+  <path d="M0 840H1920" stroke="#efffd2" stroke-opacity=".13"/>
+  <g class="reveal">
+    <rect x="144" y="150" width="184" height="36" rx="18" fill="#d4fc7b"/>
+    <text x="236" y="174" text-anchor="middle" fill="#17210e" font-size="14" font-weight="800" letter-spacing="2">INTRODUCING</text>
+    <text class="headline" x="136" y="380">A brighter</text>
+    <text class="headline" x="136" y="493">way to</text>
+    <text class="headline" x="136" y="606" fill="url(#lime)">move.</text>
+    <text class="small reveal d1" x="144" y="692">Meet your next big idea.</text>
+    <text class="label reveal d2" x="144" y="920" font-size="14" letter-spacing="3">PRODUCT NAME  /  COMING SOON</text>
+  </g>
+  <g class="device" filter="url(#shadow)">
+    <rect x="1180" y="207" width="468" height="654" rx="44" fill="#20271c" stroke="#d2fb7a" stroke-opacity=".75" stroke-width="2"/>
+    <rect x="1203" y="231" width="422" height="606" rx="30" fill="#171c14"/>
+    <rect x="1360" y="243" width="110" height="9" rx="4" fill="#4a5142"/>
+    <text x="1248" y="319" fill="#c6d2ae" font-size="15" font-weight="650" letter-spacing="3">YOUR PRODUCT</text>
+    <text x="1248" y="388" fill="#f5f8ed" font-size="44" font-weight="740" letter-spacing="-2">Built for</text>
+    <text x="1248" y="438" fill="#f5f8ed" font-size="44" font-weight="740" letter-spacing="-2">what's next.</text>
+    <rect x="1248" y="478" width="324" height="1" fill="#eaffd0" opacity=".2"/>
+    <rect x="1248" y="514" width="244" height="12" rx="6" fill="#727966" opacity=".64"/>
+    <rect x="1248" y="540" width="298" height="12" rx="6" fill="#727966" opacity=".4"/>
+    <rect x="1248" y="566" width="208" height="12" rx="6" fill="#727966" opacity=".3"/>
+    <rect x="1248" y="619" width="154" height="46" rx="23" fill="url(#lime)"/>
+    <text x="1325" y="648" text-anchor="middle" fill="#18220e" font-size="14" font-weight="800" letter-spacing="1">EXPLORE</text>
+    <circle cx="1511" cy="746" r="58" fill="#c7fa70" fill-opacity=".12" stroke="#c7fa70" stroke-opacity=".65"/>
+    <path d="M1488 746h46m-18-18 18 18-18 18" fill="none" stroke="#d8ff8b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect class="scan" x="1180" y="207" width="2" height="654" fill="#e6ffab" opacity=".5"/>
+  </g>
+  <g class="spark" fill="#dcff94">
+    <path d="M1696 282v42m-21-21h42" stroke="#dcff94" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <circle cx="1085" cy="750" r="5" fill="#d4fc7b"/><circle cx="1714" cy="746" r="4" fill="#d4fc7b" opacity=".65"/>
+  <rect x="36" y="36" width="1848" height="1008" rx="22" fill="none" stroke="#e3ffbd" stroke-opacity=".14" stroke-width="2"/>
+</svg>

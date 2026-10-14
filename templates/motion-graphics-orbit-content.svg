@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="title desc">
+  <title id="title">Orbit — cinematic content slide template</title>
+  <desc id="desc">A cinematic midnight-blue content slide with a clear story area and animated three-part orbital diagram.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#08091b"/><stop offset="1" stop-color="#17133b"/>
+    </linearGradient>
+    <linearGradient id="orbit" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#b6a3ff"/><stop offset=".52" stop-color="#7867ff"/><stop offset="1" stop-color="#55e3e8"/>
+    </linearGradient>
+    <radialGradient id="aura">
+      <stop stop-color="#7466ff" stop-opacity=".32"/><stop offset="1" stop-color="#7466ff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="12" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse">
+      <path d="M64 0H0V64" fill="none" stroke="#b4b5ff" stroke-opacity=".05"/>
+    </pattern>
+    <style>
+      text { font-family: Inter, ui-sans-serif, system-ui, "Segoe UI", sans-serif; }
+      .eyebrow { fill: #aaa5e8; font-size: 17px; font-weight: 650; letter-spacing: 5px; }
+      .heading { fill: #f7f5ff; font-size: 67px; font-weight: 740; letter-spacing: -4px; }
+      .body { fill: #bdbbd9; font-size: 23px; }
+      .node-title { fill: #f7f5ff; font-size: 23px; font-weight: 700; }
+      .node-copy { fill: #bdbbd9; font-size: 16px; }
+      .fade { opacity: 0; transform: translateY(16px); animation: rise .9s cubic-bezier(.2,.7,.2,1) forwards; }
+      .d1 { animation-delay: .14s; }.d2 { animation-delay: .28s; }
+      .ring { transform-origin: 1360px 523px; animation: revolve 34s linear infinite; }
+      .point { animation: breathe 3.8s ease-in-out infinite; }
+      @keyframes rise { to { opacity: 1; transform: translateY(0); } }
+      @keyframes revolve { to { transform: rotate(360deg); } }
+      @keyframes breathe { 50% { opacity: .58; } }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+        .fade { opacity: 1; transform: none; }
+      }
+    </style>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#background)"/>
+  <rect width="1920" height="1080" fill="url(#grid)"/>
+  <ellipse cx="1360" cy="523" rx="470" ry="455" fill="url(#aura)"/>
+  <g fill="#e3e1ff">
+    <circle cx="106" cy="142" r="2" opacity=".65"/><circle cx="742" cy="181" r="2" opacity=".5"/>
+    <circle cx="1803" cy="226" r="2" opacity=".7"/><circle cx="1766" cy="878" r="2" opacity=".48"/>
+  </g>
+  <text class="eyebrow fade" x="144" y="116">01  /  THE OPPORTUNITY</text>
+  <text class="heading fade d1" x="140" y="246">Big shifts start</text>
+  <text class="heading fade d1" x="140" y="323">with a better</text>
+  <text class="heading fade d1" x="140" y="400" fill="url(#orbit)">point of view.</text>
+  <text class="body fade d2" x="146" y="485">Turn a complex challenge into a clear path</text>
+  <text class="body fade d2" x="146" y="520">forward. Replace this copy with your insight,</text>
+  <text class="body fade d2" x="146" y="555">evidence, and the change it makes possible.</text>
+  <rect x="146" y="603" width="4" height="73" rx="2" fill="url(#orbit)"/>
+  <text x="168" y="631" fill="#f7f5ff" font-size="21" font-weight="650">KEY TAKEAWAY</text>
+  <text x="168" y="662" fill="#bdbbd9" font-size="18">Put the sentence your audience should remember here.</text>
+  <g fill="none" stroke="url(#orbit)" filter="url(#glow)">
+    <ellipse class="ring" cx="1360" cy="523" rx="258" ry="116" stroke-width="3" opacity=".8"/>
+    <ellipse cx="1360" cy="523" rx="258" ry="116" stroke-width="2" opacity=".55" transform="rotate(60 1360 523)"/>
+    <ellipse cx="1360" cy="523" rx="258" ry="116" stroke-width="2" opacity=".4" transform="rotate(-60 1360 523)"/>
+  </g>
+  <circle cx="1360" cy="523" r="65" fill="#8373ff" fill-opacity=".2" stroke="#aaa0ff" stroke-opacity=".7" stroke-width="2"/>
+  <circle cx="1360" cy="523" r="8" fill="#f5f1ff" filter="url(#glow)"/>
+  <g class="point">
+    <circle cx="1360" cy="407" r="25" fill="#17133b" stroke="#8f7cff" stroke-width="3"/>
+    <circle cx="1360" cy="407" r="6" fill="#b6a3ff"/>
+  </g>
+  <circle cx="1136" cy="583" r="25" fill="#17133b" stroke="#6a91ff" stroke-width="3"/>
+  <circle cx="1136" cy="583" r="6" fill="#7ca5ff"/>
+  <circle cx="1584" cy="583" r="25" fill="#17133b" stroke="#55e3e8" stroke-width="3"/>
+  <circle cx="1584" cy="583" r="6" fill="#55e3e8"/>
+  <text class="node-title" x="1360" y="272" text-anchor="middle">Understand</text>
+  <text class="node-copy" x="1360" y="301" text-anchor="middle">Find the real need</text>
+  <text class="node-title" x="1030" y="674">Focus</text>
+  <text class="node-copy" x="1030" y="702">Choose what matters</text>
+  <text class="node-title" x="1514" y="674">Transform</text>
+  <text class="node-copy" x="1514" y="702">Make it happen</text>
+  <path d="M144 918H1776" stroke="#c2bfff" stroke-opacity=".18"/>
+  <text class="eyebrow" x="144" y="969" font-size="13" letter-spacing="3">YOUR BRAND</text>
+  <text x="1776" y="969" text-anchor="end" fill="#aaa5e8" font-size="14" letter-spacing="3">01  /  08</text>
+  <rect x="36" y="36" width="1848" height="1008" rx="22" fill="none" stroke="#c2bfff" stroke-opacity=".15" stroke-width="2"/>
+</svg>

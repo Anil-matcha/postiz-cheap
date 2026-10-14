@@ -115,6 +115,7 @@ For projects that already call multiple generative APIs through one key, [MuAPI]
 | [🚀 Launch Evidence and Benchmarks](#launch-evidence-and-benchmarks) | Cases 13–15 |
 | [🌐 Community Use Cases and Reactions](#community-use-cases-and-reactions) | Cases 16–27 |
 | [🧪 Coding-Agent Guide](docs/coding-agent-use-cases.md) | Prompt templates and implementation checklist |
+| [🎞️ Motion-Graphics Presentation Templates](#motion-graphics-presentation-templates) | Nine matching animated title and content slide pairs |
 | [🙏 Acknowledge](#acknowledge) | Attribution and correction policy |
 
 The cases below are **evidence-backed starting points**, not claims that every workflow will work without human review. Each item includes its evidence type and the source to revisit.
@@ -433,6 +434,25 @@ These cases are **not OpenAI-published material.** Each one is a named practitio
 - **Tool execution remains application responsibility.** Validate arguments, enforce permissions, record side effects, and make retries idempotent.
 - **Benchmark scores are configuration-dependent.** Reproduce the task mix and harness before using a score to choose a production model.
 - **Cybersecurity access is controlled.** Astra meets OpenAI’s Critical cybersecurity capability threshold; advanced cybersecurity access is expected to be more limited and may be provided through programs such as Daybreak.
+
+<a id="motion-graphics-presentation-templates"></a>
+## 🎞️ Motion-Graphics Presentation Templates
+
+Nine matching pairs of self-contained, animated 16:9 SVG slides: each visual style has a title slide and a reusable content slide. Open a file in a modern browser to preview it, or place it in a presentation that supports animated SVGs. Replace the sample text and data in the SVG to make it yours; colors and motion are built in, with no external assets or libraries.
+
+| Template | Style | Title slide | Content slide |
+|---|---|---|---|
+| Orbit | Cinematic, atmospheric product reveal | [Preview](templates/motion-graphics-orbit.svg) | [Preview](templates/motion-graphics-orbit-content.svg) |
+| Signal | Editorial, expressive data story | [Preview](templates/motion-graphics-signal.svg) | [Preview](templates/motion-graphics-signal-content.svg) |
+| Launch | Bold, high-energy product announcement | [Preview](templates/motion-graphics-launch.svg) | [Preview](templates/motion-graphics-launch-content.svg) |
+| Aurora | Layered gradients and subtle motion | [Preview](templates/motion-graphics-aurora.svg) | [Preview](templates/motion-graphics-aurora-content.svg) |
+| Horizon | Layered gradients and subtle motion | [Preview](templates/motion-graphics-horizon.svg) | [Preview](templates/motion-graphics-horizon-content.svg) |
+| Mosaic | Layered gradients and subtle motion | [Preview](templates/motion-graphics-mosaic.svg) | [Preview](templates/motion-graphics-mosaic-content.svg) |
+| Prism | Layered gradients and subtle motion | [Preview](templates/motion-graphics-prism.svg) | [Preview](templates/motion-graphics-prism-content.svg) |
+| Pulse | Layered gradients and subtle motion | [Preview](templates/motion-graphics-pulse.svg) | [Preview](templates/motion-graphics-pulse-content.svg) |
+| Vertex | Layered gradients and subtle motion | [Preview](templates/motion-graphics-vertex.svg) | [Preview](templates/motion-graphics-vertex-content.svg) |
+
+All slides are 1920 × 1080 vector artwork, scale cleanly, and honor the viewer’s reduced-motion preference.
 
 ## 🤝 Contributing
 
