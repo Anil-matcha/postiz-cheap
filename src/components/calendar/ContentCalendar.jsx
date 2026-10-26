@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import { 
   FaYoutube, 
   FaInstagram, 
@@ -121,6 +122,7 @@ export default function ContentCalendar({
   onDuplicatePost,
   onDeletePost,
   onPublishNow,
+  onReschedulePost,
 }) {
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [viewMode, setViewMode] = useState("month"); // "month" | "week" | "day" | "list"
@@ -129,6 +131,8 @@ export default function ContentCalendar({
   const [selectedChannelId, setSelectedChannelId] = useState(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [now, setNow] = useState(() => new Date());
+  const [draggedPostId, setDraggedPostId] = useState(null);
+  const [dragOverKey, setDragOverKey] = useState(null);
   const weekTimelineRef = useRef(null);
   const dayTimelineRef = useRef(null);
 
@@ -147,6 +151,67 @@ export default function ContentCalendar({
       dayTimelineRef.current.scrollTop = targetScroll;
     }
   }, [viewMode, now]);
+
+  // Drag and Drop rescheduling handlers
+  const handleDropOnMonthDay = async (postId, targetDate) => {
+    const post = posts.find((p) => p.id === postId);
+    if (!post) return;
+
+    const currentScheduled = post.scheduledAt ? new Date(post.scheduledAt) : new Date();
+    const newDate = new Date(targetDate);
+    newDate.setHours(currentScheduled.getHours(), currentScheduled.getMinutes(), 0, 0);
+
+    // Skip if dropping onto the same day
+    if (isSameDay(currentScheduled, targetDate)) return;
+
+    try {
+      await onReschedulePost?.(postId, newDate);
+      toast.success(
+        `Rescheduled to ${newDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })} at ${formatTime(newDate)}`,
+        { icon: "📅" }
+      );
+    } catch (err) {
+      toast.error("Failed to reschedule post.");
+    }
+  };
+
+  const handleDropOnWeekSlot = async (postId, targetDate, targetHour) => {
+    const post = posts.find((p) => p.id === postId);
+    if (!post) return;
+
+    const currentScheduled = post.scheduledAt ? new Date(post.scheduledAt) : new Date();
+    const newDate = new Date(targetDate);
+    newDate.setHours(targetHour, currentScheduled.getMinutes() || 0, 0, 0);
+
+    try {
+      await onReschedulePost?.(postId, newDate);
+      toast.success(
+        `Rescheduled to ${newDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })} at ${formatHourLabel(targetHour)}`,
+        { icon: "📅" }
+      );
+    } catch (err) {
+      toast.error("Failed to reschedule post.");
+    }
+  };
+
+  const handleDropOnDaySlot = async (postId, targetHour) => {
+    const post = posts.find((p) => p.id === postId);
+    if (!post) return;
+
+    const currentScheduled = post.scheduledAt ? new Date(post.scheduledAt) : new Date();
+    const newDate = new Date(currentDate);
+    newDate.setHours(targetHour, currentScheduled.getMinutes() || 0, 0, 0);
+
+    try {
+      await onReschedulePost?.(postId, newDate);
+      toast.success(
+        `Rescheduled to ${formatHourLabel(targetHour)}`,
+        { icon: "📅" }
+      );
+    } catch (err) {
+      toast.error("Failed to reschedule post.");
+    }
+  };
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -680,17 +745,37 @@ export default function ContentCalendar({
               {calendarDays.map((item, idx) => {
                 const dayPosts = getPostsForDay(item.date);
                 const dayIsToday = isToday(item.date);
+                const cellKey = `month-day-${idx}`;
+                const isDragOver = dragOverKey === cellKey;
 
                 return (
                   <div
                     key={idx}
                     onClick={() => onDateClick?.(item.date)}
-                    className={`min-h-[96px] sm:min-h-[108px] p-2 flex flex-col justify-between group transition-colors cursor-pointer relative ${
-                      item.isCurrentMonth
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.dataTransfer.dropEffect = "move";
+                      if (dragOverKey !== cellKey) setDragOverKey(cellKey);
+                    }}
+                    onDragLeave={() => {
+                      if (dragOverKey === cellKey) setDragOverKey(null);
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setDragOverKey(null);
+                      const postId = e.dataTransfer.getData("text/plain");
+                      if (postId) {
+                        handleDropOnMonthDay(postId, item.date);
+                      }
+                    }}
+                    className={`min-h-[96px] sm:min-h-[108px] p-2 flex flex-col justify-between group transition-all cursor-pointer relative ${
+                      isDragOver
+                        ? "ring-2 ring-inset ring-[#612bd3] bg-[#612bd3]/15 dark:bg-[#612bd3]/25 border-dashed border-[#612bd3] scale-[1.01] z-10 shadow-md"
+                        : item.isCurrentMonth
                         ? "bg-white dark:bg-transparent hover:bg-zinc-50/80 dark:hover:bg-[#1a1919]/60"
                         : "bg-zinc-50/60 dark:bg-[#0e0e0e]/80 text-zinc-400 dark:text-[#666666] hover:bg-zinc-100/50 dark:hover:bg-[#161515]/50"
                     } ${
-                      dayIsToday
+                      dayIsToday && !isDragOver
                         ? "ring-1 ring-inset ring-[#fc69ff]/70 bg-[#fc69ff]/[0.03] dark:bg-[#fc69ff]/[0.05]"
                         : ""
                     }`}
@@ -709,18 +794,25 @@ export default function ContentCalendar({
                         {item.date.getDate()}
                       </span>
 
-                      {/* Hover Quick Add '+' button */}
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDateClick?.(item.date);
-                        }}
-                        className="opacity-0 group-hover:opacity-100 w-5 h-5 rounded-[6px] bg-[#612bd3]/20 hover:bg-[#612bd3] text-[#8c66ff] hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-2xs"
-                        title="Add post on this day"
-                      >
-                        <FaPlus className="text-[9px]" />
-                      </button>
+                      {/* Drop hint indicator when dragging over */}
+                      {isDragOver ? (
+                        <span className="text-[9px] font-bold text-[#612bd3] dark:text-[#8c66ff] uppercase tracking-wider animate-pulse">
+                          Drop here
+                        </span>
+                      ) : (
+                        /* Hover Quick Add '+' button */
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDateClick?.(item.date);
+                          }}
+                          className="opacity-0 group-hover:opacity-100 w-5 h-5 rounded-[6px] bg-[#612bd3]/20 hover:bg-[#612bd3] text-[#8c66ff] hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-2xs"
+                          title="Add post on this day"
+                        >
+                          <FaPlus className="text-[9px]" />
+                        </button>
+                      )}
                     </div>
 
                     {/* Posts Cards Container */}
@@ -733,6 +825,9 @@ export default function ContentCalendar({
                           onDuplicatePost={onDuplicatePost}
                           onDeletePost={onDeletePost}
                           formatTime={formatTime}
+                          isDragging={draggedPostId === post.id}
+                          onDragStart={setDraggedPostId}
+                          onDragEnd={() => setDraggedPostId(null)}
                         />
                       ))}
                     </div>
@@ -816,6 +911,8 @@ export default function ContentCalendar({
                     {weekDays.map((d, dayIdx) => {
                       const hourPosts = getPostsForHour(d, hour);
                       const isTodaySlot = dayIdx === weekTodayIndex;
+                      const slotKey = `week-slot-${dayIdx}-${hour}`;
+                      const isDragOver = dragOverKey === slotKey;
 
                       return (
                         <div
@@ -825,8 +922,26 @@ export default function ContentCalendar({
                             target.setHours(hour, 0, 0, 0);
                             onDateClick?.(target);
                           }}
-                          className={`p-1.5 border-b border-zinc-200 dark:border-[#252525] min-h-[58px] flex flex-col gap-1 relative group cursor-pointer transition-colors ${
-                            isTodaySlot
+                          onDragOver={(e) => {
+                            e.preventDefault();
+                            e.dataTransfer.dropEffect = "move";
+                            if (dragOverKey !== slotKey) setDragOverKey(slotKey);
+                          }}
+                          onDragLeave={() => {
+                            if (dragOverKey === slotKey) setDragOverKey(null);
+                          }}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            setDragOverKey(null);
+                            const postId = e.dataTransfer.getData("text/plain");
+                            if (postId) {
+                              handleDropOnWeekSlot(postId, d, hour);
+                            }
+                          }}
+                          className={`p-1.5 border-b border-zinc-200 dark:border-[#252525] min-h-[58px] flex flex-col gap-1 relative group cursor-pointer transition-all ${
+                            isDragOver
+                              ? "ring-2 ring-inset ring-[#612bd3] bg-[#612bd3]/20 dark:bg-[#612bd3]/30 z-20 shadow-md"
+                              : isTodaySlot
                               ? "bg-[#fc69ff]/[0.02] dark:bg-[#fc69ff]/[0.04] hover:bg-[#fc69ff]/[0.05]"
                               : "hover:bg-zinc-50 dark:hover:bg-[#1a1919]"
                           }`}
@@ -866,6 +981,9 @@ export default function ContentCalendar({
                               onDuplicatePost={onDuplicatePost}
                               onDeletePost={onDeletePost}
                               formatTime={formatTime}
+                              isDragging={draggedPostId === post.id}
+                              onDragStart={setDraggedPostId}
+                              onDragEnd={() => setDraggedPostId(null)}
                             />
                           ))}
                         </div>
@@ -919,6 +1037,8 @@ export default function ContentCalendar({
                 const hourPosts = getPostsForHour(currentDate, hour);
                 const isSelectedDayToday = isToday(currentDate);
                 const isCurrentHour = isSelectedDayToday && currentHour === hour;
+                const slotKey = `day-slot-${hour}`;
+                const isDragOver = dragOverKey === slotKey;
 
                 return (
                   <div
@@ -928,8 +1048,26 @@ export default function ContentCalendar({
                       target.setHours(hour, 0, 0, 0);
                       onDateClick?.(target);
                     }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.dataTransfer.dropEffect = "move";
+                      if (dragOverKey !== slotKey) setDragOverKey(slotKey);
+                    }}
+                    onDragLeave={() => {
+                      if (dragOverKey === slotKey) setDragOverKey(null);
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setDragOverKey(null);
+                      const postId = e.dataTransfer.getData("text/plain");
+                      if (postId) {
+                        handleDropOnDaySlot(postId, hour);
+                      }
+                    }}
                     className={`p-2.5 rounded-lg border transition-all cursor-pointer relative group ${
-                      isCurrentHour
+                      isDragOver
+                        ? "ring-2 ring-inset ring-[#612bd3] bg-[#612bd3]/20 dark:bg-[#612bd3]/30 z-20 shadow-md"
+                        : isCurrentHour
                         ? "border-[#fc69ff]/60 bg-[#fc69ff]/[0.03] dark:bg-[#fc69ff]/[0.05]"
                         : "border-zinc-200/80 dark:border-[#252525] bg-white dark:bg-[#191919] hover:border-zinc-300 dark:hover:border-[#353535]"
                     }`}
@@ -943,6 +1081,11 @@ export default function ContentCalendar({
                         {isCurrentHour && (
                           <span className="px-1.5 py-0.5 rounded bg-[#fc69ff] text-black text-[10px] font-bold">
                             Now ({formatTime(now)})
+                          </span>
+                        )}
+                        {isDragOver && (
+                          <span className="px-1.5 py-0.5 rounded bg-[#612bd3] text-white text-[10px] font-bold animate-pulse">
+                            Drop to schedule at {formatHourLabel(hour)}
                           </span>
                         )}
                       </div>
@@ -973,6 +1116,9 @@ export default function ContentCalendar({
                             onDuplicatePost={onDuplicatePost}
                             onDeletePost={onDeletePost}
                             formatTime={formatTime}
+                            isDragging={draggedPostId === post.id}
+                            onDragStart={setDraggedPostId}
+                            onDragEnd={() => setDraggedPostId(null)}
                           />
                         ))}
                       </div>
@@ -1131,7 +1277,16 @@ export default function ContentCalendar({
 // =========================================================================
 // CALENDAR ITEM CARD (Matching Reference App Top Banner & Hover Actions)
 // =========================================================================
-function CalendarItemCard({ post, onPostClick, onDuplicatePost, onDeletePost, formatTime }) {
+function CalendarItemCard({
+  post,
+  onPostClick,
+  onDuplicatePost,
+  onDeletePost,
+  formatTime,
+  isDragging = false,
+  onDragStart,
+  onDragEnd,
+}) {
   const plat = PLATFORM_CONFIG[post.platform] || PLATFORM_CONFIG.youtube;
   const Icon = plat.Icon;
   const isCompleted = post.status === "completed";
@@ -1141,11 +1296,22 @@ function CalendarItemCard({ post, onPostClick, onDuplicatePost, onDeletePost, fo
 
   return (
     <div
+      draggable={true}
+      onDragStart={(e) => {
+        e.dataTransfer.setData("text/plain", post.id);
+        e.dataTransfer.effectAllowed = "move";
+        onDragStart?.(post.id);
+      }}
+      onDragEnd={() => {
+        onDragEnd?.();
+      }}
       onClick={(e) => {
         e.stopPropagation();
         onPostClick?.(post);
       }}
-      className={`rounded-[10px] overflow-hidden border border-zinc-200 dark:border-[#282828] bg-white dark:bg-[#1c1c1c] hover:border-zinc-300 dark:hover:border-[#383838] transition-all shadow-xs group/card relative ${
+      className={`rounded-[10px] overflow-hidden border border-zinc-200 dark:border-[#282828] bg-white dark:bg-[#1c1c1c] hover:border-zinc-300 dark:hover:border-[#383838] transition-all shadow-xs group/card relative cursor-grab active:cursor-grabbing select-none ${
+        isDragging ? "opacity-30 scale-95 ring-2 ring-[#612bd3]" : ""
+      } ${
         isError
           ? "ring-1 ring-red-500"
           : isCompleted
@@ -1176,9 +1342,27 @@ function CalendarItemCard({ post, onPostClick, onDuplicatePost, onDeletePost, fo
         className="h-5 px-1.5 flex items-center justify-between text-white text-[10px] font-semibold transition-colors select-none"
         style={{ backgroundColor: plat.bannerBg }}
       >
-        <span className="truncate group-hover/card:hidden tracking-wider uppercase text-[9px]">
-          {plat.name}
-        </span>
+        <div className="flex items-center min-w-0">
+          {/* Subtle 6-dot drag grip handle */}
+          <svg
+            width="6"
+            height="10"
+            viewBox="0 0 6 10"
+            fill="currentColor"
+            className="opacity-60 group-hover/card:opacity-100 shrink-0 mr-1 cursor-grab"
+            title="Drag to reschedule"
+          >
+            <circle cx="1.5" cy="1.5" r="1" />
+            <circle cx="4.5" cy="1.5" r="1" />
+            <circle cx="1.5" cy="5" r="1" />
+            <circle cx="4.5" cy="5" r="1" />
+            <circle cx="1.5" cy="8.5" r="1" />
+            <circle cx="4.5" cy="8.5" r="1" />
+          </svg>
+          <span className="truncate group-hover/card:hidden tracking-wider uppercase text-[9px]">
+            {plat.name}
+          </span>
+        </div>
 
         {/* Hover Quick Actions */}
         <div className="hidden group-hover/card:flex items-center gap-1.5 text-white">

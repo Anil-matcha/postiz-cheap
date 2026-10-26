@@ -173,6 +173,38 @@ export default function WorkspaceDashboard() {
     }
   };
 
+  const handleReschedulePost = async (postId, newScheduledAt) => {
+    const prevPosts = [...posts];
+    const postToUpdate = posts.find((p) => p.id === postId);
+    if (!postToUpdate) return;
+
+    const newIsoDate = newScheduledAt instanceof Date ? newScheduledAt.toISOString() : newScheduledAt;
+
+    // Optimistic update
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId ? { ...p, scheduledAt: newIsoDate, status: "scheduled", error: null } : p
+      )
+    );
+
+    try {
+      const res = await fetch(`/api/posts/${postId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scheduledAt: newIsoDate })
+      });
+
+      if (!res.ok) {
+        throw new Error("Server failed to reschedule post");
+      }
+    } catch (err) {
+      console.error("Reschedule failed:", err);
+      // Rollback
+      setPosts(prevPosts);
+      throw err;
+    }
+  };
+
   const handlePostSaved = (savedPost) => {
     setPosts((prev) => {
       const idx = prev.findIndex((p) => p.id === savedPost.id);
@@ -353,6 +385,7 @@ export default function WorkspaceDashboard() {
         onDuplicatePost={handleEditPost}
         onDeletePost={handleDeletePost}
         onPublishNow={handlePublishNow}
+        onReschedulePost={handleReschedulePost}
       />
 
       {/* Post Details / Quick Actions Modal */}
