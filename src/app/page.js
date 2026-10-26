@@ -345,9 +345,14 @@ export default function WorkspaceDashboard() {
       {/* Content Calendar Main Component */}
       <ContentCalendar
         posts={posts}
+        connectedAccounts={connectedAccounts}
         onDateClick={handleDateClick}
         onPostClick={handlePostClick}
         onNewPostClick={handleNewPost}
+        onWriteWithAi={handleWriteWithAi}
+        onDuplicatePost={handleEditPost}
+        onDeletePost={handleDeletePost}
+        onPublishNow={handlePublishNow}
       />
 
       {/* Post Details / Quick Actions Modal */}
