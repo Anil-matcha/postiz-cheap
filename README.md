@@ -10,6 +10,9 @@
   A self-hostable social media scheduler for creators who want a shared calendar, a focused post composer, and control over their own deployment.
 </p>
 
+<p align="center"><a href="https://youtu.be/a71ep45k6kc"><img src="https://i.ytimg.com/vi/a71ep45k6kc/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/a71ep45k6kc"><b>▶ Watch: Free Open-source Postiz alternative </b></a></p>
+
 Postiz-cheap brings post planning, platform-specific copy, AI writing, account connections, and publishing into one Next.js app. Run it on your own infrastructure and choose the providers you want to use. The application is MIT licensed; hosting, AI, social publishing, and payment providers may charge separately.
 
 > Postiz-cheap is an independent project. It is not affiliated with, endorsed by, or operated by Postiz.
