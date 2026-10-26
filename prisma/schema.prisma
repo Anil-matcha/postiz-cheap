@@ -44,6 +44,7 @@ model User {
   accounts       Account[]
   sessions       Session[]
   scheduledPosts ScheduledPost[]
+  postTags       PostTag[]
   AppInstance    AppInstance[]
   Creation       Creation[]
 }
@@ -66,6 +67,8 @@ model ScheduledPost {
   title          String    @db.Text
   description    String?   @db.Text
   tags           String?   @db.Text
+  customTag      String?
+  tagColor       String?
   privacy        String    @default("public")
   disableComment Boolean   @default(false)
   disableDuet    Boolean   @default(false)
@@ -80,6 +83,18 @@ model ScheduledPost {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PostTag {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  color     String   @default("#612bd3")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name])
 }
 
 model AppInstance {

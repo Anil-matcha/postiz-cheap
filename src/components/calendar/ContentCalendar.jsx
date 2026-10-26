@@ -32,7 +32,8 @@ import {
   FiChevronDown, 
   FiChevronUp, 
   FiX,
-  FiCheck
+  FiCheck,
+  FiTag
 } from "react-icons/fi";
 
 const PLATFORM_CONFIG = {
@@ -127,6 +128,8 @@ export default function ContentCalendar({
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [viewMode, setViewMode] = useState("month"); // "month" | "week" | "day" | "list"
   const [platformFilter, setPlatformFilter] = useState("all");
+  const [tagFilter, setTagFilter] = useState("all");
+  const [availableTags, setAvailableTags] = useState([]);
   const [statusFilter, setStatusFilter] = useState("all"); // for list view: "all" | "scheduled" | "draft" | "published"
   const [selectedChannelId, setSelectedChannelId] = useState(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -135,6 +138,29 @@ export default function ContentCalendar({
   const [dragOverKey, setDragOverKey] = useState(null);
   const weekTimelineRef = useRef(null);
   const dayTimelineRef = useRef(null);
+
+  // Fetch available custom tags
+  useEffect(() => {
+    fetch("/api/tags")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data)) setAvailableTags(data);
+      })
+      .catch(() => {});
+  }, []);
+
+  const allTagOptions = useMemo(() => {
+    const map = new Map();
+    availableTags.forEach((t) => {
+      if (t.name) map.set(t.name.toLowerCase(), t);
+    });
+    posts.forEach((p) => {
+      if (p.customTag && !map.has(p.customTag.toLowerCase())) {
+        map.set(p.customTag.toLowerCase(), { name: p.customTag, color: p.tagColor || "#612bd3" });
+      }
+    });
+    return Array.from(map.values());
+  }, [availableTags, posts]);
 
   // 1-minute ticker for the Now Line
   useEffect(() => {
@@ -304,10 +330,11 @@ export default function ContentCalendar({
     setCurrentDate(new Date());
   };
 
-  // Filtered posts based on platform, status, and channel
+  // Filtered posts based on platform, status, channel, and custom tag
   const filteredPosts = useMemo(() => {
     return posts.filter((post) => {
       if (platformFilter !== "all" && post.platform !== platformFilter) return false;
+      if (tagFilter !== "all" && (post.customTag || "").toLowerCase() !== tagFilter.toLowerCase()) return false;
       if (selectedChannelId && post.channelId && post.channelId !== selectedChannelId) return false;
       if (viewMode === "list" && statusFilter !== "all") {
         if (statusFilter === "scheduled" && post.status !== "scheduled") return false;
@@ -316,7 +343,7 @@ export default function ContentCalendar({
       }
       return true;
     });
-  }, [posts, platformFilter, selectedChannelId, viewMode, statusFilter]);
+  }, [posts, platformFilter, tagFilter, selectedChannelId, viewMode, statusFilter]);
 
   // Calendar calculations for Month View (42-day Mon-Sun grid)
   const calendarDays = useMemo(() => {
@@ -677,6 +704,33 @@ export default function ContentCalendar({
                 );
               })}
             </div>
+
+            {/* Tag Filter Dropdown */}
+            {allTagOptions.length > 0 && (
+              <div className="flex items-center gap-1.5 bg-white dark:bg-[#141414] px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-[#252525] text-xs shadow-2xs">
+                <FiTag className="text-[#612bd3] dark:text-[#fc69ff] text-[11px] shrink-0" />
+                <select
+                  value={tagFilter}
+                  onChange={(e) => setTagFilter(e.target.value)}
+                  className="bg-transparent text-xs text-zinc-700 dark:text-zinc-200 font-medium outline-none cursor-pointer pr-1"
+                >
+                  <option value="all">All Tags</option>
+                  {allTagOptions.map((t) => (
+                    <option key={t.name} value={t.name}>#{t.name}</option>
+                  ))}
+                </select>
+                {tagFilter !== "all" && (
+                  <button
+                    type="button"
+                    onClick={() => setTagFilter("all")}
+                    className="text-zinc-400 hover:text-red-500 text-[10px] ml-0.5 cursor-pointer"
+                    title="Clear tag filter"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            )}
 
             {/* View Mode Switcher: Day | Week | Month */}
             <div className="flex items-center bg-white dark:bg-[#141414] p-1 rounded-lg border border-zinc-200 dark:border-[#252525] text-xs shadow-2xs">
@@ -1218,7 +1272,7 @@ export default function ContentCalendar({
                               <div className="flex items-center gap-3 min-w-0">
                                 <div
                                   className="w-1.5 h-10 rounded-full shrink-0"
-                                  style={{ backgroundColor: plat.bannerBg }}
+                                  style={{ backgroundColor: post.tagColor || plat.bannerBg }}
                                 />
 
                                 <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-black/50 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center shrink-0">
@@ -1242,6 +1296,15 @@ export default function ContentCalendar({
 
                               {/* Right Status & Actions */}
                               <div className="flex items-center gap-2 shrink-0">
+                                {post.customTag && (
+                                  <span
+                                    className="px-2 py-0.5 rounded text-[10px] font-bold text-white shadow-2xs"
+                                    style={{ backgroundColor: post.tagColor || "#612bd3" }}
+                                  >
+                                    #{post.customTag}
+                                  </span>
+                                )}
+
                                 <span
                                   className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider ${
                                     post.status === "completed"
@@ -1363,10 +1426,10 @@ function CalendarItemCard({
         </span>
       )}
 
-      {/* Top Banner with Platform Color & Hover Quick Actions */}
+      {/* Top Banner with Platform or Custom Tag Color & Hover Quick Actions */}
       <div
         className="h-5 px-1.5 flex items-center justify-between text-white text-[10px] font-semibold transition-colors select-none"
-        style={{ backgroundColor: plat.bannerBg }}
+        style={{ backgroundColor: post.tagColor || plat.bannerBg }}
       >
         <div className="flex items-center min-w-0">
           {/* Subtle 6-dot drag grip handle */}
@@ -1386,7 +1449,7 @@ function CalendarItemCard({
             <circle cx="4.5" cy="8.5" r="1" />
           </svg>
           <span className="truncate group-hover/card:hidden tracking-wider uppercase text-[9px]">
-            {plat.name}
+            {post.customTag ? `#${post.customTag}` : plat.name}
           </span>
         </div>
 

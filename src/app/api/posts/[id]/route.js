@@ -169,6 +169,8 @@ export async function PATCH(req, { params }) {
         if (body.title !== undefined) updateData.title = body.title;
         if (body.description !== undefined) updateData.description = body.description;
         if (body.privacy !== undefined) updateData.privacy = body.privacy;
+        if (body.customTag !== undefined) updateData.customTag = body.customTag;
+        if (body.tagColor !== undefined) updateData.tagColor = body.tagColor;
 
         const updatedPost = await prisma.scheduledPost.update({
           where: { id },
