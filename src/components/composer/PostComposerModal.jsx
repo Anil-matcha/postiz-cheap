@@ -140,6 +140,31 @@ export default function PostComposerModal({
   const [mediaUrl, setMediaUrl] = useState("");
   const [privacy, setPrivacy] = useState("public");
 
+  // Phase 2.2: Platform-Specific Caption & Media Overrides
+  const [platformOverrides, setPlatformOverrides] = useState({});
+  const [activeComposerTab, setActiveComposerTab] = useState("all");
+
+  const hasPlatformOverride = (platKey) => {
+    const ov = platformOverrides[platKey];
+    if (!ov) return false;
+    return (
+      (ov.title !== undefined && ov.title !== null && ov.title.trim() !== "") ||
+      (ov.description !== undefined && ov.description !== null && ov.description.trim() !== "") ||
+      (ov.tags !== undefined && ov.tags !== null && ov.tags.trim() !== "") ||
+      (ov.mediaUrl !== undefined && ov.mediaUrl !== null && ov.mediaUrl.trim() !== "")
+    );
+  };
+
+  const getEffectiveContent = (platKey) => {
+    const ov = platformOverrides[platKey] || {};
+    return {
+      title: ov.title !== undefined && ov.title !== null && ov.title.trim() !== "" ? ov.title : title,
+      description: ov.description !== undefined && ov.description !== null && ov.description.trim() !== "" ? ov.description : description,
+      tags: ov.tags !== undefined && ov.tags !== null && ov.tags.trim() !== "" ? ov.tags : tags,
+      mediaUrl: ov.mediaUrl !== undefined && ov.mediaUrl !== null && ov.mediaUrl.trim() !== "" ? ov.mediaUrl : mediaUrl,
+    };
+  };
+
   // Fetch available tags
   useEffect(() => {
     fetch("/api/tags")
@@ -203,6 +228,9 @@ export default function PostComposerModal({
         const updated = prev.filter((k) => k !== key);
         if (activePreviewPlatform === key) {
           setActivePreviewPlatform(updated[0]);
+        }
+        if (activeComposerTab === key) {
+          setActiveComposerTab("all");
         }
         return updated;
       } else {
@@ -408,17 +436,123 @@ export default function PostComposerModal({
   };
 
   const handleApplyAiContent = ({ title: newTitle, description: newDescription, tags: newTags }) => {
-    if (newTitle) setTitle(newTitle);
-    if (newDescription) setDescription(newDescription);
-    if (newTags) setTags(newTags);
+    if (activeComposerTab === "all") {
+      if (newTitle) setTitle(newTitle);
+      if (newDescription) setDescription(newDescription);
+      if (newTags) setTags(newTags);
+    } else {
+      setPlatformOverrides((prev) => ({
+        ...prev,
+        [activeComposerTab]: {
+          ...prev[activeComposerTab],
+          ...(newTitle ? { title: newTitle } : {}),
+          ...(newDescription ? { description: newDescription } : {}),
+          ...(newTags ? { tags: newTags } : {}),
+        },
+      }));
+    }
     setAiWriterOpen(false);
   };
 
   if (!isOpen) return null;
 
-  const currentPlatformInfo = PLATFORMS.find(p => p.key === activePreviewPlatform) || PLATFORMS[0];
-  const charLimit = currentPlatformInfo.limit;
-  const currentChars = (description || "").length;
+  const currentPlatformInfo = PLATFORMS.find((p) => p.key === activePreviewPlatform) || PLATFORMS[0];
+  const currentActivePlatformInfo =
+    PLATFORMS.find((p) => p.key === (activeComposerTab === "all" ? activePreviewPlatform : activeComposerTab)) || PLATFORMS[0];
+
+  const currentTabTitle = activeComposerTab === "all"
+    ? title
+    : (platformOverrides[activeComposerTab]?.title !== undefined
+        ? platformOverrides[activeComposerTab].title
+        : title);
+
+  const currentTabDescription = activeComposerTab === "all"
+    ? description
+    : (platformOverrides[activeComposerTab]?.description !== undefined
+        ? platformOverrides[activeComposerTab].description
+        : description);
+
+  const currentTabMediaUrl = activeComposerTab === "all"
+    ? mediaUrl
+    : (platformOverrides[activeComposerTab]?.mediaUrl !== undefined
+        ? platformOverrides[activeComposerTab].mediaUrl
+        : mediaUrl);
+
+  const isCurrentTabOverridden = activeComposerTab !== "all" && hasPlatformOverride(activeComposerTab);
+  const currentTabHasMediaOverride = activeComposerTab !== "all" && !!platformOverrides[activeComposerTab]?.mediaUrl;
+
+  const currentTabCharLimit = activeComposerTab === "all"
+    ? Math.min(...selectedPlatforms.map((pk) => PLATFORMS.find((p) => p.key === pk)?.limit || 5000))
+    : (PLATFORMS.find((p) => p.key === activeComposerTab)?.limit || 5000);
+
+  const currentChars = (currentTabDescription || "").length;
+
+  const limitingPlatform = activeComposerTab === "all"
+    ? PLATFORMS.find((p) => selectedPlatforms.includes(p.key) && p.limit === currentTabCharLimit)
+    : PLATFORMS.find((p) => p.key === activeComposerTab);
+
+  const handleTitleChange = (val) => {
+    if (activeComposerTab === "all") {
+      setTitle(val);
+    } else {
+      setPlatformOverrides((prev) => ({
+        ...prev,
+        [activeComposerTab]: {
+          ...prev[activeComposerTab],
+          title: val,
+        },
+      }));
+    }
+  };
+
+  const handleDescriptionChange = (val) => {
+    if (activeComposerTab === "all") {
+      setDescription(val);
+    } else {
+      setPlatformOverrides((prev) => ({
+        ...prev,
+        [activeComposerTab]: {
+          ...prev[activeComposerTab],
+          description: val,
+        },
+      }));
+    }
+  };
+
+  const handleMediaUrlChange = (val) => {
+    if (activeComposerTab === "all") {
+      setMediaUrl(val);
+    } else {
+      setPlatformOverrides((prev) => ({
+        ...prev,
+        [activeComposerTab]: {
+          ...prev[activeComposerTab],
+          mediaUrl: val,
+        },
+      }));
+    }
+  };
+
+  const resetCurrentTabOverride = () => {
+    if (activeComposerTab === "all") return;
+    setPlatformOverrides((prev) => {
+      const copy = { ...prev };
+      delete copy[activeComposerTab];
+      return copy;
+    });
+  };
+
+  const resetCurrentTabMediaOverride = () => {
+    if (activeComposerTab === "all") return;
+    setPlatformOverrides((prev) => {
+      if (!prev[activeComposerTab]) return prev;
+      const copy = { ...prev };
+      const current = { ...copy[activeComposerTab] };
+      delete current.mediaUrl;
+      copy[activeComposerTab] = current;
+      return copy;
+    });
+  };
 
   const handleMediaUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -436,30 +570,68 @@ export default function PostComposerModal({
         body: formData,
       });
 
+      let finalUrl = "";
       if (!res.ok) {
-        // Fallback to object URL or demo preview if upload API fails
-        const localUrl = URL.createObjectURL(file);
-        setMediaUrl(localUrl);
+        finalUrl = URL.createObjectURL(file);
       } else {
         const data = await res.json();
-        setMediaUrl(data.url || URL.createObjectURL(file));
+        finalUrl = data.url || URL.createObjectURL(file);
+      }
+
+      if (activeComposerTab === "all") {
+        setMediaUrl(finalUrl);
+      } else {
+        setPlatformOverrides((prev) => ({
+          ...prev,
+          [activeComposerTab]: {
+            ...prev[activeComposerTab],
+            mediaUrl: finalUrl,
+          },
+        }));
       }
     } catch (err) {
       console.warn("Upload fallback used:", err);
-      setMediaUrl(URL.createObjectURL(file));
+      const fallbackUrl = URL.createObjectURL(file);
+      if (activeComposerTab === "all") {
+        setMediaUrl(fallbackUrl);
+      } else {
+        setPlatformOverrides((prev) => ({
+          ...prev,
+          [activeComposerTab]: {
+            ...prev[activeComposerTab],
+            mediaUrl: fallbackUrl,
+          },
+        }));
+      }
     } finally {
       setUploading(false);
     }
   };
 
   const addHashtag = (tag) => {
-    if (!description.includes(tag)) {
-      setDescription(prev => prev ? `${prev} ${tag}` : tag);
+    if (activeComposerTab === "all") {
+      if (!description.includes(tag)) {
+        setDescription((prev) => (prev ? `${prev} ${tag}` : tag));
+      }
+    } else {
+      const currentDesc = platformOverrides[activeComposerTab]?.description !== undefined
+        ? platformOverrides[activeComposerTab].description
+        : description;
+      if (!currentDesc.includes(tag)) {
+        setPlatformOverrides((prev) => ({
+          ...prev,
+          [activeComposerTab]: {
+            ...prev[activeComposerTab],
+            description: currentDesc ? `${currentDesc} ${tag}` : tag,
+          },
+        }));
+      }
     }
   };
 
   const handleSubmit = async (statusOverride = null, forceImmediate = false) => {
-    if (!mediaUrl) {
+    const hasAnyMedia = mediaUrl || Object.values(platformOverrides).some((o) => !!o.mediaUrl);
+    if (!hasAnyMedia) {
       setErrorMsg("Please upload or provide a media URL for your post.");
       return;
     }
@@ -480,6 +652,7 @@ export default function PostComposerModal({
         accountId: parseInt(accountId) || 101,
         accountName,
         platformAccountMap,
+        platformOverrides,
         title,
         description,
         tags,
@@ -756,16 +929,109 @@ export default function PostComposerModal({
               );
             })()}
 
+            {/* Platform Caption & Media Overrides Tab Bar (Phase 2.2) */}
+            <div className="bg-white dark:bg-zinc-900/60 p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 shadow-2xs space-y-1.5">
+              <div className="flex items-center justify-between gap-2 px-1">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 shrink-0">
+                    Target Content:
+                  </span>
+                  {activeComposerTab === "all" ? (
+                    <span className="text-[11px] text-zinc-600 dark:text-zinc-400 truncate">
+                      Editing base post for all channels
+                    </span>
+                  ) : isCurrentTabOverridden ? (
+                    <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1.5 truncate">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shrink-0" />
+                      <span>Custom override active for {currentActivePlatformInfo.name}</span>
+                    </span>
+                  ) : (
+                    <span className="text-[11px] text-zinc-500 truncate">
+                      Syncing with All Channels (type below to customize for {currentActivePlatformInfo.name})
+                    </span>
+                  )}
+                </div>
+
+                {activeComposerTab !== "all" && isCurrentTabOverridden && (
+                  <button
+                    type="button"
+                    onClick={resetCurrentTabOverride}
+                    className="text-[10px] font-semibold text-zinc-500 hover:text-red-500 dark:text-zinc-400 dark:hover:text-red-400 transition-colors cursor-pointer flex items-center gap-1 shrink-0"
+                    title="Reset to All Channels content"
+                  >
+                    <FiRefreshCw className="text-[9px]" />
+                    <span>Reset to Base</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Tabs List */}
+              <div className="flex items-center gap-1 overflow-x-auto pb-0.5 scrollbar-thin">
+                <button
+                  type="button"
+                  onClick={() => setActiveComposerTab("all")}
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 select-none ${
+                    activeComposerTab === "all"
+                      ? "bg-[#612bd3] text-white shadow-xs font-bold"
+                      : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  }`}
+                >
+                  <span>🌐</span>
+                  <span>All Channels</span>
+                </button>
+
+                {selectedPlatforms.map((platKey) => {
+                  const plat = PLATFORMS.find((p) => p.key === platKey);
+                  if (!plat) return null;
+                  const Icon = plat.Icon;
+                  const isCurrent = activeComposerTab === platKey;
+                  const hasOverride = hasPlatformOverride(platKey);
+
+                  return (
+                    <button
+                      key={platKey}
+                      type="button"
+                      onClick={() => {
+                        setActiveComposerTab(platKey);
+                        setActivePreviewPlatform(platKey);
+                      }}
+                      className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 shrink-0 select-none relative ${
+                        isCurrent
+                          ? "bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 shadow-xs font-bold"
+                          : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-transparent"
+                      }`}
+                    >
+                      <Icon className={`text-xs ${isCurrent ? (platKey === "x_twitter" ? "text-sky-400" : plat.color) : plat.color}`} />
+                      <span>{plat.name}</span>
+                      {hasOverride && (
+                        <span
+                          className="w-2 h-2 rounded-full bg-amber-400 dark:bg-amber-300 ring-2 ring-white dark:ring-zinc-900 shrink-0"
+                          title="Customized override active"
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* 2. Post Title */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-zinc-800 dark:text-zinc-300 tracking-wider uppercase block">
-                2. POST TITLE / HEADLINE
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-zinc-800 dark:text-zinc-300 tracking-wider uppercase block">
+                  2. POST TITLE / HEADLINE
+                </label>
+                {activeComposerTab !== "all" && platformOverrides[activeComposerTab]?.title !== undefined && (
+                  <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
+                    (Custom title for {currentActivePlatformInfo.name})
+                  </span>
+                )}
+              </div>
               <input
                 type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Give your post a strong, clickable title..."
+                value={currentTabTitle}
+                onChange={(e) => handleTitleChange(e.target.value)}
+                placeholder={`Give your ${activeComposerTab !== "all" ? currentActivePlatformInfo.name : ""} post a strong, clickable title...`}
                 className="w-full bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-md px-3.5 py-2 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-[#612bd3] dark:focus:border-zinc-600 transition-colors shadow-2xs"
               />
             </div>
@@ -789,16 +1055,36 @@ export default function PostComposerModal({
                     </button>
                   )}
                 </div>
-                <span className={`text-[11px] font-mono ${currentChars > charLimit ? "text-red-500 font-semibold" : "text-zinc-500 dark:text-zinc-400"}`}>
-                  {currentChars} / {charLimit}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className={`text-[11px] font-mono ${currentChars > currentTabCharLimit ? "text-red-500 font-bold" : "text-zinc-500 dark:text-zinc-400"}`}>
+                    {currentChars} / {currentTabCharLimit}
+                  </span>
+                  {activeComposerTab === "all" && selectedPlatforms.length > 1 && limitingPlatform && (
+                    <span className="text-[10px] text-zinc-500 font-sans hidden sm:inline">
+                      ({limitingPlatform.name} max)
+                    </span>
+                  )}
+                  {activeComposerTab !== "all" && (
+                    <span className="text-[10px] text-zinc-500 font-sans hidden sm:inline">
+                      ({currentActivePlatformInfo.name} max)
+                    </span>
+                  )}
+                </div>
               </div>
               <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                value={currentTabDescription}
+                onChange={(e) => handleDescriptionChange(e.target.value)}
                 rows={4}
-                placeholder="Write your caption, hook, call to action, and hashtags..."
-                className="w-full bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-md p-3 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-[#612bd3] dark:focus:border-zinc-600 transition-colors resize-none leading-relaxed shadow-2xs"
+                placeholder={
+                  activeComposerTab !== "all"
+                    ? `Write custom caption specifically for ${currentActivePlatformInfo.name}...`
+                    : "Write your caption, hook, call to action, and hashtags..."
+                }
+                className={`w-full bg-white dark:bg-zinc-900/60 border rounded-md p-3 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none transition-colors resize-none leading-relaxed shadow-2xs ${
+                  currentChars > currentTabCharLimit
+                    ? "border-red-400 focus:border-red-500 ring-1 ring-red-400/30"
+                    : "border-zinc-200 dark:border-zinc-800 focus:border-[#612bd3] dark:focus:border-zinc-600"
+                }`}
               />
 
               {/* Hashtag Quick Chips */}
@@ -980,21 +1266,47 @@ export default function PostComposerModal({
 
             {/* 5. Media Attachment */}
             <div className="space-y-2">
-              <label className="text-xs font-bold text-zinc-800 dark:text-zinc-300 tracking-wider uppercase block">
-                5. MEDIA ATTACHMENT (VIDEO / IMAGE)
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-zinc-800 dark:text-zinc-300 tracking-wider uppercase block">
+                  5. MEDIA ATTACHMENT (VIDEO / IMAGE)
+                </label>
+                {activeComposerTab !== "all" && (
+                  <div className="flex items-center gap-1.5 text-[10px]">
+                    {currentTabHasMediaOverride ? (
+                      <>
+                        <span className="text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                          Custom {currentActivePlatformInfo.name} Media
+                        </span>
+                        <button
+                          type="button"
+                          onClick={resetCurrentTabMediaOverride}
+                          className="text-zinc-500 hover:text-red-500 dark:text-zinc-400 dark:hover:text-red-400 transition-colors cursor-pointer underline ml-1"
+                          title="Revert to All Channels media"
+                        >
+                          Use Base Media
+                        </button>
+                      </>
+                    ) : (
+                      <span className="text-zinc-500 dark:text-zinc-400">
+                        Using All Channels media
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
 
-              {mediaUrl ? (
+              {currentTabMediaUrl ? (
                 <div className="relative rounded-md overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-black aspect-video max-h-44 group shadow-2xs">
                   <img
-                    src={mediaUrl}
+                    src={currentTabMediaUrl}
                     alt="Media preview"
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                     <button
                       type="button"
-                      onClick={() => setMediaUrl("")}
+                      onClick={() => handleMediaUrlChange("")}
                       className="px-3 py-1.5 rounded-md bg-red-600/90 hover:bg-red-600 text-white text-xs font-medium flex items-center gap-1.5 cursor-pointer shadow-sm"
                     >
                       <FiTrash2 /> Remove
@@ -1012,7 +1324,11 @@ export default function PostComposerModal({
                     </div>
                     <div>
                       <p className="text-xs font-medium text-zinc-800 dark:text-zinc-300">
-                        {uploading ? "Uploading..." : "Click or drag & drop video/image"}
+                        {uploading
+                          ? "Uploading..."
+                          : activeComposerTab !== "all"
+                          ? `Upload custom media for ${currentActivePlatformInfo.name}`
+                          : "Click or drag & drop video/image"}
                       </p>
                       <p className="text-[10px] text-zinc-500 mt-0.5">
                         MP4, MOV, JPG, PNG up to 100MB
@@ -1031,9 +1347,13 @@ export default function PostComposerModal({
                     <FiLink className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 text-xs" />
                     <input
                       type="url"
-                      value={mediaUrl}
-                      onChange={(e) => setMediaUrl(e.target.value)}
-                      placeholder="Or paste media URL directly (https://...)"
+                      value={currentTabMediaUrl}
+                      onChange={(e) => handleMediaUrlChange(e.target.value)}
+                      placeholder={
+                        activeComposerTab !== "all"
+                          ? `Or paste custom media URL for ${currentActivePlatformInfo.name} (https://...)`
+                          : "Or paste media URL directly (https://...)"
+                      }
                       className="w-full bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-md pl-8 pr-3 py-1.5 text-xs text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-[#612bd3] dark:focus:border-zinc-600 transition-colors shadow-2xs"
                     />
                   </div>
@@ -1309,14 +1629,20 @@ export default function PostComposerModal({
             <LiveDevicePreview
               platform={activePreviewPlatform}
               selectedPlatforms={selectedPlatforms}
-              onSelectPlatform={(plat) => setActivePreviewPlatform(plat)}
-              title={title}
-              description={description}
-              tags={tags}
+              onSelectPlatform={(plat) => {
+                setActivePreviewPlatform(plat);
+                if (activeComposerTab !== "all") {
+                  setActiveComposerTab(plat);
+                }
+              }}
+              title={getEffectiveContent(activePreviewPlatform).title}
+              description={getEffectiveContent(activePreviewPlatform).description}
+              tags={getEffectiveContent(activePreviewPlatform).tags}
               customTag={customTag}
               tagColor={tagColor}
-              mediaUrl={mediaUrl}
+              mediaUrl={getEffectiveContent(activePreviewPlatform).mediaUrl}
               accountName={accountName}
+              overriddenPlatforms={Object.keys(platformOverrides).filter(hasPlatformOverride)}
             />
           </div>
         </div>

@@ -31,6 +31,7 @@ export default function LiveDevicePreview({
   accountName = "Creator Studio",
   customTag = "",
   tagColor = "",
+  overriddenPlatforms = [],
 }) {
   const [activePreviewTab, setActivePreviewTab] = useState(platform);
 
@@ -92,6 +93,7 @@ export default function LiveDevicePreview({
               .map((tab) => {
                 const Icon = tab.Icon;
                 const isActive = activePreviewTab === tab.key;
+                const isOverridden = overriddenPlatforms.includes(tab.key);
                 return (
                   <button
                     key={tab.key}
@@ -109,6 +111,12 @@ export default function LiveDevicePreview({
                   >
                     <Icon className={`text-xs ${isActive ? "text-current" : tab.color}`} />
                     <span>{tab.name}</span>
+                    {isOverridden && (
+                      <span
+                        className="w-1.5 h-1.5 rounded-full bg-amber-400 dark:bg-amber-300 ring-1 ring-white dark:ring-zinc-900 shrink-0 ml-0.5"
+                        title="Platform override active"
+                      />
+                    )}
                   </button>
                 );
               })}

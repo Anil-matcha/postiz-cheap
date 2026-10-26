@@ -332,6 +332,13 @@ export async function POST(req) {
       platAccountId = parseInt(platAccountId) || 101;
       platAccountName = platAccountName || `${plat} Account`;
 
+      // Resolve platform-specific overrides if provided
+      const override = (body.platformOverrides && (body.platformOverrides[plat] || body.platformOverrides[normPlat])) || {};
+      const postTitle = (override.title !== undefined && override.title !== null && override.title.trim() !== "") ? override.title : title;
+      const postDescription = (override.description !== undefined && override.description !== null && override.description.trim() !== "") ? override.description : description;
+      const postTags = (override.tags !== undefined && override.tags !== null && override.tags.trim() !== "") ? override.tags : tags;
+      const postMediaUrl = (override.mediaUrl !== undefined && override.mediaUrl !== null && override.mediaUrl.trim() !== "") ? override.mediaUrl : mediaUrl;
+
       if (isScheduled) {
         try {
           const post = await prisma.scheduledPost.create({
@@ -340,10 +347,10 @@ export async function POST(req) {
               accountId: platAccountId,
               platform: plat,
               accountName: platAccountName,
-              mediaUrl,
-              title: title || "",
-              description: description || "",
-              tags: tags || "",
+              mediaUrl: postMediaUrl,
+              title: postTitle || "",
+              description: postDescription || "",
+              tags: postTags || "",
               customTag: customTag || null,
               tagColor: tagColor || null,
               privacy: privacy || "public",
@@ -364,10 +371,10 @@ export async function POST(req) {
             accountId: platAccountId,
             platform: plat,
             accountName: platAccountName,
-            mediaUrl,
-            title: title || "",
-            description: description || "",
-            tags: tags || "",
+            mediaUrl: postMediaUrl,
+            title: postTitle || "",
+            description: postDescription || "",
+            tags: postTags || "",
             customTag: customTag || null,
             tagColor: tagColor || null,
             privacy: privacy || "public",
@@ -394,10 +401,10 @@ export async function POST(req) {
           try {
             requestId = await triggerMuApiPublish(plat, {
               accountId: platAccountId,
-              mediaUrl,
-              title,
-              description,
-              tags,
+              mediaUrl: postMediaUrl,
+              title: postTitle,
+              description: postDescription,
+              tags: postTags,
               privacy,
               disableComment,
               disableDuet,
@@ -426,10 +433,10 @@ export async function POST(req) {
               accountId: platAccountId,
               platform: plat,
               accountName: platAccountName,
-              mediaUrl,
-              title: title || "",
-              description: description || "",
-              tags: tags || "",
+              mediaUrl: postMediaUrl,
+              title: postTitle || "",
+              description: postDescription || "",
+              tags: postTags || "",
               customTag: customTag || null,
               tagColor: tagColor || null,
               privacy: privacy || "public",
@@ -452,10 +459,10 @@ export async function POST(req) {
             accountId: platAccountId,
             platform: plat,
             accountName: platAccountName,
-            mediaUrl,
-            title: title || "",
-            description: description || "",
-            tags: tags || "",
+            mediaUrl: postMediaUrl,
+            title: postTitle || "",
+            description: postDescription || "",
+            tags: postTags || "",
             customTag: customTag || null,
             tagColor: tagColor || null,
             privacy: privacy || "public",
