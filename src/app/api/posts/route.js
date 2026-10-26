@@ -190,7 +190,7 @@ export async function GET(req) {
           const status = result.status || result.state;
 
           if (status === "completed" || status === "succeeded") {
-            const output = result.output || {};
+            const output = result.output || (Array.isArray(result.outputs) ? result.outputs[0] : null) || {};
             const publishedUrl = output.url || output.x_url || output.instagram_url || output.facebook_url || output.linkedin_url || output.threads_url || output.pinterest_url || (output.publish_id ? `https://${post.platform}.com/post/${output.publish_id}` : null);
             
             await prisma.scheduledPost.update({

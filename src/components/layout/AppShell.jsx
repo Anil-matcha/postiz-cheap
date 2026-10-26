@@ -24,7 +24,8 @@ import {
   FiPlus, 
   FiLogOut, 
   FiMenu, 
-  FiDollarSign
+  FiDollarSign,
+  FiBarChart2
 } from "react-icons/fi";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -86,6 +87,11 @@ export default function AppShell({ children }) {
       exact: true,
     },
     {
+      name: "Analytics",
+      path: "/analytics",
+      icon: <FiBarChart2 className="w-5 h-5" />,
+    },
+    {
       name: "Agent",
       path: "/agents",
       icon: <FiCpu className="w-5 h-5" />,
@@ -109,6 +115,7 @@ export default function AppShell({ children }) {
 
   const getPageTitle = () => {
     if (pathname === "/") return "Calendar";
+    if (pathname.startsWith("/analytics")) return "Analytics & Performance";
     if (pathname.startsWith("/agents")) return "AI Social Agent";
     if (pathname.startsWith("/integrations")) return "Channels & Integrations";
     if (pathname.startsWith("/gallery")) return "Media Library";
