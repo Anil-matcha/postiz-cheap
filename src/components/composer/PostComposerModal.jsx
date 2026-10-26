@@ -32,6 +32,7 @@ import {
 } from "react-icons/fi";
 import LiveDevicePreview from "./LiveDevicePreview";
 import AiPostWriter from "./AiPostWriter";
+import CustomSelect from "@/components/ui/CustomSelect";
 
 const TAG_COLOR_PALETTE = [
   "#612bd3", // Studio Purple
@@ -87,6 +88,28 @@ const YOUTUBE_CATEGORIES = [
   { label: "Entertainment", value: "24" },
   { label: "Education", value: "27" },
   { label: "Science & Technology", value: "28" },
+];
+
+const YOUTUBE_PRIVACY_OPTIONS = [
+  { value: "public", label: "Public" },
+  { value: "unlisted", label: "Unlisted" },
+  { value: "private", label: "Private" },
+];
+
+const INSTAGRAM_PLACEMENT_OPTIONS = [
+  { value: "reels", label: "Reels" },
+  { value: "feed", label: "Feed Post" },
+];
+
+const FACEBOOK_PLACEMENT_OPTIONS = [
+  { value: "timeline", label: "Timeline Post" },
+  { value: "reels", label: "Facebook Reels" },
+];
+
+const X_REPLY_OPTIONS = [
+  { value: "everyone", label: "Everyone" },
+  { value: "following", label: "Accounts you follow" },
+  { value: "mentionedUsers", label: "Only accounts you mention" },
 ];
 
 const POPULAR_HASHTAGS = ["#trending", "#ai", "#tech", "#innovation", "#growth", "#viral", "#creators"];
@@ -710,22 +733,24 @@ export default function PostComposerModal({
                   </div>
 
                   {activePlatAccounts.length > 1 && (
-                    <select
-                      value={accountId}
-                      onChange={(e) => {
-                        const sel = activePlatAccounts.find((a) => String(a.id) === e.target.value);
-                        if (sel) {
-                          setAccountId(String(sel.id));
-                          setAccountName(sel.account_name);
-                          setPlatformAccountMap((prev) => ({ ...prev, [activePreviewPlatform]: sel.id }));
-                        }
-                      }}
-                      className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded px-2 py-1 text-[11px] text-zinc-800 dark:text-zinc-200 outline-none shrink-0"
-                    >
-                      {activePlatAccounts.map((a) => (
-                        <option key={a.id} value={a.id}>{a.account_name}</option>
-                      ))}
-                    </select>
+                    <div className="w-44 sm:w-48 shrink-0">
+                      <CustomSelect
+                        value={accountId}
+                        onChange={(val) => {
+                          const sel = activePlatAccounts.find((a) => String(a.id) === String(val));
+                          if (sel) {
+                            setAccountId(String(sel.id));
+                            setAccountName(sel.account_name);
+                            setPlatformAccountMap((prev) => ({ ...prev, [activePreviewPlatform]: sel.id }));
+                          }
+                        }}
+                        options={activePlatAccounts.map((a) => ({
+                          value: String(a.id),
+                          label: a.account_name,
+                        }))}
+                        size="sm"
+                      />
+                    </div>
                   )}
                 </div>
               );
@@ -1017,11 +1042,13 @@ export default function PostComposerModal({
             </div>
 
             {/* Platform Specific Settings Accordion */}
-            <div className="border border-zinc-200 dark:border-zinc-800 rounded-md overflow-hidden bg-white dark:bg-zinc-900/20 shadow-2xs">
+            <div className={`border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-900/20 shadow-2xs relative ${advancedOpen ? "z-30" : "overflow-hidden"}`}>
               <button
                 type="button"
                 onClick={() => setAdvancedOpen(!advancedOpen)}
-                className="w-full px-3.5 py-2.5 flex items-center justify-between text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer"
+                className={`w-full px-3.5 py-2.5 flex items-center justify-between text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer ${
+                  advancedOpen ? "rounded-t-md" : "rounded-md"
+                }`}
               >
                 <span>Settings for {currentPlatformInfo.name}</span>
                 {advancedOpen ? <FaChevronUp className="text-[10px]" /> : <FaChevronDown className="text-[10px]" />}
@@ -1061,29 +1088,23 @@ export default function PostComposerModal({
                         <label className="text-[11px] font-medium text-zinc-700 dark:text-zinc-400 block mb-1">
                           Category
                         </label>
-                        <select
+                        <CustomSelect
                           value={categoryId}
-                          onChange={(e) => setCategoryId(e.target.value)}
-                          className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-md px-2.5 py-1.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#612bd3] dark:focus:border-zinc-700 shadow-2xs"
-                        >
-                          {YOUTUBE_CATEGORIES.map((c) => (
-                            <option key={c.value} value={c.value}>{c.label}</option>
-                          ))}
-                        </select>
+                          onChange={(val) => setCategoryId(val)}
+                          options={YOUTUBE_CATEGORIES}
+                          size="sm"
+                        />
                       </div>
                       <div>
                         <label className="text-[11px] font-medium text-zinc-700 dark:text-zinc-400 block mb-1">
                           Privacy
                         </label>
-                        <select
+                        <CustomSelect
                           value={privacy}
-                          onChange={(e) => setPrivacy(e.target.value)}
-                          className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-md px-2.5 py-1.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#612bd3] dark:focus:border-zinc-700 shadow-2xs"
-                        >
-                          <option value="public">Public</option>
-                          <option value="unlisted">Unlisted</option>
-                          <option value="private">Private</option>
-                        </select>
+                          onChange={(val) => setPrivacy(val)}
+                          options={YOUTUBE_PRIVACY_OPTIONS}
+                          size="sm"
+                        />
                       </div>
                       <div className="sm:col-span-2 flex items-center gap-2 pt-1">
                         <input
@@ -1138,14 +1159,12 @@ export default function PostComposerModal({
                         <label className="text-[11px] font-medium text-zinc-700 dark:text-zinc-400 block mb-1">
                           Placement
                         </label>
-                        <select
+                        <CustomSelect
                           value={placement}
-                          onChange={(e) => setPlacement(e.target.value)}
-                          className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-md px-2.5 py-1.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#612bd3] dark:focus:border-zinc-700 shadow-2xs"
-                        >
-                          <option value="reels">Reels</option>
-                          <option value="feed">Feed Post</option>
-                        </select>
+                          onChange={(val) => setPlacement(val)}
+                          options={INSTAGRAM_PLACEMENT_OPTIONS}
+                          size="sm"
+                        />
                       </div>
                       <div className="flex items-center justify-between text-xs text-zinc-700 dark:text-zinc-300">
                         <span>Share Reels to Main Feed</span>
@@ -1165,14 +1184,12 @@ export default function PostComposerModal({
                         <label className="text-[11px] font-medium text-zinc-700 dark:text-zinc-400 block mb-1">
                           Placement
                         </label>
-                        <select
+                        <CustomSelect
                           value={placement}
-                          onChange={(e) => setPlacement(e.target.value)}
-                          className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-md px-2.5 py-1.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#612bd3] dark:focus:border-zinc-700 shadow-2xs"
-                        >
-                          <option value="timeline">Timeline Post</option>
-                          <option value="reels">Facebook Reels</option>
-                        </select>
+                          onChange={(val) => setPlacement(val)}
+                          options={FACEBOOK_PLACEMENT_OPTIONS}
+                          size="sm"
+                        />
                       </div>
                     </div>
                   )}
@@ -1183,15 +1200,12 @@ export default function PostComposerModal({
                         <label className="text-[11px] font-medium text-zinc-700 dark:text-zinc-400 block mb-1">
                           Who can reply
                         </label>
-                        <select
+                        <CustomSelect
                           value={replySettings}
-                          onChange={(e) => setReplySettings(e.target.value)}
-                          className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-md px-2.5 py-1.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#612bd3] dark:focus:border-zinc-700 shadow-2xs"
-                        >
-                          <option value="everyone">Everyone</option>
-                          <option value="following">Accounts you follow</option>
-                          <option value="mentionedUsers">Only accounts you mention</option>
-                        </select>
+                          onChange={(val) => setReplySettings(val)}
+                          options={X_REPLY_OPTIONS}
+                          size="sm"
+                        />
                       </div>
                     </div>
                   )}

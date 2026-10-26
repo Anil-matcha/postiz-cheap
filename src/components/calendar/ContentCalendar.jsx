@@ -35,6 +35,7 @@ import {
   FiCheck,
   FiTag
 } from "react-icons/fi";
+import CustomSelect from "@/components/ui/CustomSelect";
 
 const PLATFORM_CONFIG = {
   youtube: { 
@@ -161,6 +162,17 @@ export default function ContentCalendar({
     });
     return Array.from(map.values());
   }, [availableTags, posts]);
+
+  const tagSelectOptions = useMemo(() => {
+    return [
+      { value: "all", label: "All Tags" },
+      ...allTagOptions.map((t) => ({
+        value: t.name,
+        label: `#${t.name}`,
+        color: t.color || "#612bd3",
+      })),
+    ];
+  }, [allTagOptions]);
 
   // 1-minute ticker for the Now Line
   useEffect(() => {
@@ -705,28 +717,26 @@ export default function ContentCalendar({
               })}
             </div>
 
-            {/* Tag Filter Dropdown */}
+            {/* Custom Tag Filter Dropdown */}
             {allTagOptions.length > 0 && (
-              <div className="flex items-center gap-1.5 bg-white dark:bg-[#141414] px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-[#252525] text-xs shadow-2xs">
-                <FiTag className="text-[#612bd3] dark:text-[#fc69ff] text-[11px] shrink-0" />
-                <select
+              <div className="flex items-center gap-1.5">
+                <CustomSelect
                   value={tagFilter}
-                  onChange={(e) => setTagFilter(e.target.value)}
-                  className="bg-transparent text-xs text-zinc-700 dark:text-zinc-200 font-medium outline-none cursor-pointer pr-1"
-                >
-                  <option value="all">All Tags</option>
-                  {allTagOptions.map((t) => (
-                    <option key={t.name} value={t.name}>#{t.name}</option>
-                  ))}
-                </select>
+                  onChange={setTagFilter}
+                  options={tagSelectOptions}
+                  size="sm"
+                  icon={FiTag}
+                  className="w-32 sm:w-36"
+                  buttonClassName="h-9 rounded-lg"
+                />
                 {tagFilter !== "all" && (
                   <button
                     type="button"
                     onClick={() => setTagFilter("all")}
-                    className="text-zinc-400 hover:text-red-500 text-[10px] ml-0.5 cursor-pointer"
+                    className="h-9 px-2 rounded-lg border border-zinc-200 dark:border-[#2a2929] bg-white dark:bg-[#201f1f] hover:bg-red-50 dark:hover:bg-red-950/30 text-zinc-400 hover:text-red-500 text-xs transition-colors cursor-pointer shadow-2xs flex items-center justify-center"
                     title="Clear tag filter"
                   >
-                    ×
+                    ✕
                   </button>
                 )}
               </div>
