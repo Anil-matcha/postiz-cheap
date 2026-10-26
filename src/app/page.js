@@ -195,7 +195,8 @@ export default function WorkspaceDashboard() {
       });
 
       if (!res.ok) {
-        throw new Error("Server failed to reschedule post");
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || "Server failed to reschedule post");
       }
     } catch (err) {
       console.error("Reschedule failed:", err);

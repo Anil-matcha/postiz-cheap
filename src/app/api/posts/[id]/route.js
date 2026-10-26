@@ -12,7 +12,7 @@ export async function DELETE(req, { params }) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     try {
       const post = await prisma.scheduledPost.findUnique({
         where: { id }
@@ -47,7 +47,7 @@ export async function PATCH(req, { params }) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const body = await req.json();
 
     try {
@@ -56,8 +56,8 @@ export async function PATCH(req, { params }) {
       });
 
       if (post) {
-        if (post.status === "processing") {
-          return NextResponse.json({ error: "Cannot modify a post that is currently uploading." }, { status: 400 });
+        if (body.action === "publish_now" && post.status === "processing") {
+          return NextResponse.json({ error: "Cannot publish a post that is currently uploading." }, { status: 400 });
         }
 
         if (body.action === "publish_now") {
