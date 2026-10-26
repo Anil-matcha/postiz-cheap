@@ -1,20 +1,22 @@
 "use client";
 
 import { SessionProvider } from "next-auth/react";
-import { useEffect } from "react";
-import config from "@/lib/config";
+import { ThemeProvider } from "next-themes";
+import { Toaster } from "react-hot-toast";
 
 export function Providers({ children }) {
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const theme = config?.theme || "slate-indigo";
-      document.documentElement.setAttribute("data-theme", theme);
-    }
-  }, []);
-
   return (
     <SessionProvider>
-      {children}
+      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+        {children}
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            className: "bg-white dark:bg-[#201f1f] text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-[#2e2d2d] shadow-lg rounded-xl text-xs font-medium",
+            duration: 3500,
+          }}
+        />
+      </ThemeProvider>
     </SessionProvider>
   );
 }

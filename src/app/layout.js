@@ -1,8 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-import Navbar from "../components/Navbar";
-import config from "@/lib/config";
+import AppShell from "@/components/layout/AppShell";
 
 const inter = Inter({ 
   variable: "--font-inter", 
@@ -11,21 +10,18 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "Postiz-cheap | Open-source social media scheduler",
-  description: "Self-host Postiz-cheap, an open-source social media scheduler with a content calendar, AI writing, and publishing integrations.",
+  title: "AI Social Media Scheduler & Creator Studio",
+  description: "Schedule, preview and publish AI-powered content across all your social platforms.",
 };
 
 export default function RootLayout({ children }) {
-  const theme = config?.theme || "slate-indigo";
-
   return (
-    <html lang="en" className="min-h-screen w-full" data-theme={theme}>
-      <body className={`${inter.variable} ${inter.className} min-h-screen w-full flex flex-col antialiased bg-bg-page text-primary-text overflow-x-hidden`}>
+    <html lang="en" suppressHydrationWarning className="h-full w-full overflow-hidden">
+      <body className={`${inter.variable} ${inter.className} h-full w-full antialiased overflow-hidden`}>
         <Providers>
-          <Navbar />
-          <main className="flex-1 w-full flex flex-col min-h-0">
+          <AppShell>
             {children}
-          </main>
+          </AppShell>
         </Providers>
       </body>
     </html>

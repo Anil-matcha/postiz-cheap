@@ -1,5 +1,5 @@
 const config = {
-  appName: "Postiz-cheap",
+  appName: "Free Ai Social Media Scheduler",
   auth: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID,

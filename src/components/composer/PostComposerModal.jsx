@@ -27,10 +27,23 @@ import {
   FiInfo,
   FiPlus,
   FiExternalLink,
-  FiRefreshCw
+  FiRefreshCw,
+  FiTag
 } from "react-icons/fi";
 import LiveDevicePreview from "./LiveDevicePreview";
 import AiPostWriter from "./AiPostWriter";
+import CustomSelect from "@/components/ui/CustomSelect";
+
+const TAG_COLOR_PALETTE = [
+  "#612bd3", // Studio Purple
+  "#10b981", // Emerald
+  "#f59e0b", // Amber
+  "#06b6d4", // Cyan
+  "#ec4899", // Pink
+  "#3b82f6", // Blue
+  "#ef4444", // Red
+  "#8b5cf6", // Violet
+];
 
 const PLATFORMS = [
   { key: "youtube", name: "YouTube", Icon: FaYoutube, color: "text-red-500", activeStyle: "bg-red-500/15 border-red-500/60 text-white shadow-sm shadow-red-500/20", limit: 5000 },
@@ -77,6 +90,28 @@ const YOUTUBE_CATEGORIES = [
   { label: "Science & Technology", value: "28" },
 ];
 
+const YOUTUBE_PRIVACY_OPTIONS = [
+  { value: "public", label: "Public" },
+  { value: "unlisted", label: "Unlisted" },
+  { value: "private", label: "Private" },
+];
+
+const INSTAGRAM_PLACEMENT_OPTIONS = [
+  { value: "reels", label: "Reels" },
+  { value: "feed", label: "Feed Post" },
+];
+
+const FACEBOOK_PLACEMENT_OPTIONS = [
+  { value: "timeline", label: "Timeline Post" },
+  { value: "reels", label: "Facebook Reels" },
+];
+
+const X_REPLY_OPTIONS = [
+  { value: "everyone", label: "Everyone" },
+  { value: "following", label: "Accounts you follow" },
+  { value: "mentionedUsers", label: "Only accounts you mention" },
+];
+
 const POPULAR_HASHTAGS = ["#trending", "#ai", "#tech", "#innovation", "#growth", "#viral", "#creators"];
 
 export default function PostComposerModal({
@@ -96,8 +131,88 @@ export default function PostComposerModal({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState("");
+  const [customTag, setCustomTag] = useState("");
+  const [tagColor, setTagColor] = useState("");
+  const [availableTags, setAvailableTags] = useState([]);
+  const [isCreatingCustomTag, setIsCreatingCustomTag] = useState(false);
+  const [newTagName, setNewTagName] = useState("");
+  const [newTagColor, setNewTagColor] = useState("#612bd3");
   const [mediaUrl, setMediaUrl] = useState("");
   const [privacy, setPrivacy] = useState("public");
+
+  // Phase 2.2: Platform-Specific Caption & Media Overrides
+  const [platformOverrides, setPlatformOverrides] = useState({});
+  const [activeComposerTab, setActiveComposerTab] = useState("all");
+
+  const hasPlatformOverride = (platKey) => {
+    const ov = platformOverrides[platKey];
+    if (!ov) return false;
+    return (
+      (ov.title !== undefined && ov.title !== null && ov.title.trim() !== "") ||
+      (ov.description !== undefined && ov.description !== null && ov.description.trim() !== "") ||
+      (ov.tags !== undefined && ov.tags !== null && ov.tags.trim() !== "") ||
+      (ov.mediaUrl !== undefined && ov.mediaUrl !== null && ov.mediaUrl.trim() !== "")
+    );
+  };
+
+  const getEffectiveContent = (platKey) => {
+    const ov = platformOverrides[platKey] || {};
+    return {
+      title: ov.title !== undefined && ov.title !== null && ov.title.trim() !== "" ? ov.title : title,
+      description: ov.description !== undefined && ov.description !== null && ov.description.trim() !== "" ? ov.description : description,
+      tags: ov.tags !== undefined && ov.tags !== null && ov.tags.trim() !== "" ? ov.tags : tags,
+      mediaUrl: ov.mediaUrl !== undefined && ov.mediaUrl !== null && ov.mediaUrl.trim() !== "" ? ov.mediaUrl : mediaUrl,
+    };
+  };
+
+  // Fetch available tags
+  useEffect(() => {
+    fetch("/api/tags")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data)) setAvailableTags(data);
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleCreateTag = async () => {
+    const cleanName = newTagName.trim().replace(/^#+/, "");
+    if (!cleanName) return;
+    try {
+      const res = await fetch("/api/tags", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: cleanName, color: newTagColor }),
+      });
+      if (res.ok) {
+        const created = await res.json();
+        setAvailableTags((prev) => {
+          const exists = prev.find((t) => t.name.toLowerCase() === created.name.toLowerCase());
+          if (exists) return prev.map((t) => (t.id === exists.id ? created : t));
+          return [...prev, created];
+        });
+        setCustomTag(created.name);
+        setTagColor(created.color);
+        setNewTagName("");
+        setIsCreatingCustomTag(false);
+      }
+    } catch (e) {
+      console.error("Failed to create tag:", e);
+    }
+  };
+
+  const handleDeleteTag = async (e, tagId) => {
+    e.stopPropagation();
+    try {
+      await fetch(`/api/tags/${tagId}`, { method: "DELETE" });
+      setAvailableTags((prev) => prev.filter((t) => t.id !== tagId));
+      const deleted = availableTags.find((t) => t.id === tagId);
+      if (deleted && customTag === deleted.name) {
+        setCustomTag("");
+        setTagColor("");
+      }
+    } catch (_) {}
+  };
 
   // Add Channel Modal states
   const [addChannelModalOpen, setAddChannelModalOpen] = useState(false);
@@ -113,6 +228,9 @@ export default function PostComposerModal({
         const updated = prev.filter((k) => k !== key);
         if (activePreviewPlatform === key) {
           setActivePreviewPlatform(updated[0]);
+        }
+        if (activeComposerTab === key) {
+          setActiveComposerTab("all");
         }
         return updated;
       } else {
@@ -185,6 +303,8 @@ export default function PostComposerModal({
       setTitle(initialPost.title || "");
       setDescription(initialPost.description || "");
       setTags(initialPost.tags || "");
+      setCustomTag(initialPost.customTag || "");
+      setTagColor(initialPost.tagColor || "");
       setMediaUrl(initialPost.mediaUrl || "");
       setPrivacy(initialPost.privacy || "public");
       setAccountName(initialPost.accountName || "Creator Studio");
@@ -195,11 +315,15 @@ export default function PostComposerModal({
         setIsScheduled(true);
       }
     } else if (initialDate) {
+      setCustomTag("");
+      setTagColor("");
       const d = new Date(initialDate);
       setScheduledDate(d.toISOString().split("T")[0]);
       setScheduledTime("14:00");
       setIsScheduled(true);
     } else {
+      setCustomTag("");
+      setTagColor("");
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       setScheduledDate(tomorrow.toISOString().split("T")[0]);
@@ -312,17 +436,123 @@ export default function PostComposerModal({
   };
 
   const handleApplyAiContent = ({ title: newTitle, description: newDescription, tags: newTags }) => {
-    if (newTitle) setTitle(newTitle);
-    if (newDescription) setDescription(newDescription);
-    if (newTags) setTags(newTags);
+    if (activeComposerTab === "all") {
+      if (newTitle) setTitle(newTitle);
+      if (newDescription) setDescription(newDescription);
+      if (newTags) setTags(newTags);
+    } else {
+      setPlatformOverrides((prev) => ({
+        ...prev,
+        [activeComposerTab]: {
+          ...prev[activeComposerTab],
+          ...(newTitle ? { title: newTitle } : {}),
+          ...(newDescription ? { description: newDescription } : {}),
+          ...(newTags ? { tags: newTags } : {}),
+        },
+      }));
+    }
     setAiWriterOpen(false);
   };
 
   if (!isOpen) return null;
 
-  const currentPlatformInfo = PLATFORMS.find(p => p.key === activePreviewPlatform) || PLATFORMS[0];
-  const charLimit = currentPlatformInfo.limit;
-  const currentChars = (description || "").length;
+  const currentPlatformInfo = PLATFORMS.find((p) => p.key === activePreviewPlatform) || PLATFORMS[0];
+  const currentActivePlatformInfo =
+    PLATFORMS.find((p) => p.key === (activeComposerTab === "all" ? activePreviewPlatform : activeComposerTab)) || PLATFORMS[0];
+
+  const currentTabTitle = activeComposerTab === "all"
+    ? title
+    : (platformOverrides[activeComposerTab]?.title !== undefined
+        ? platformOverrides[activeComposerTab].title
+        : title);
+
+  const currentTabDescription = activeComposerTab === "all"
+    ? description
+    : (platformOverrides[activeComposerTab]?.description !== undefined
+        ? platformOverrides[activeComposerTab].description
+        : description);
+
+  const currentTabMediaUrl = activeComposerTab === "all"
+    ? mediaUrl
+    : (platformOverrides[activeComposerTab]?.mediaUrl !== undefined
+        ? platformOverrides[activeComposerTab].mediaUrl
+        : mediaUrl);
+
+  const isCurrentTabOverridden = activeComposerTab !== "all" && hasPlatformOverride(activeComposerTab);
+  const currentTabHasMediaOverride = activeComposerTab !== "all" && !!platformOverrides[activeComposerTab]?.mediaUrl;
+
+  const currentTabCharLimit = activeComposerTab === "all"
+    ? Math.min(...selectedPlatforms.map((pk) => PLATFORMS.find((p) => p.key === pk)?.limit || 5000))
+    : (PLATFORMS.find((p) => p.key === activeComposerTab)?.limit || 5000);
+
+  const currentChars = (currentTabDescription || "").length;
+
+  const limitingPlatform = activeComposerTab === "all"
+    ? PLATFORMS.find((p) => selectedPlatforms.includes(p.key) && p.limit === currentTabCharLimit)
+    : PLATFORMS.find((p) => p.key === activeComposerTab);
+
+  const handleTitleChange = (val) => {
+    if (activeComposerTab === "all") {
+      setTitle(val);
+    } else {
+      setPlatformOverrides((prev) => ({
+        ...prev,
+        [activeComposerTab]: {
+          ...prev[activeComposerTab],
+          title: val,
+        },
+      }));
+    }
+  };
+
+  const handleDescriptionChange = (val) => {
+    if (activeComposerTab === "all") {
+      setDescription(val);
+    } else {
+      setPlatformOverrides((prev) => ({
+        ...prev,
+        [activeComposerTab]: {
+          ...prev[activeComposerTab],
+          description: val,
+        },
+      }));
+    }
+  };
+
+  const handleMediaUrlChange = (val) => {
+    if (activeComposerTab === "all") {
+      setMediaUrl(val);
+    } else {
+      setPlatformOverrides((prev) => ({
+        ...prev,
+        [activeComposerTab]: {
+          ...prev[activeComposerTab],
+          mediaUrl: val,
+        },
+      }));
+    }
+  };
+
+  const resetCurrentTabOverride = () => {
+    if (activeComposerTab === "all") return;
+    setPlatformOverrides((prev) => {
+      const copy = { ...prev };
+      delete copy[activeComposerTab];
+      return copy;
+    });
+  };
+
+  const resetCurrentTabMediaOverride = () => {
+    if (activeComposerTab === "all") return;
+    setPlatformOverrides((prev) => {
+      if (!prev[activeComposerTab]) return prev;
+      const copy = { ...prev };
+      const current = { ...copy[activeComposerTab] };
+      delete current.mediaUrl;
+      copy[activeComposerTab] = current;
+      return copy;
+    });
+  };
 
   const handleMediaUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -340,30 +570,68 @@ export default function PostComposerModal({
         body: formData,
       });
 
+      let finalUrl = "";
       if (!res.ok) {
-        // Fallback to object URL or demo preview if upload API fails
-        const localUrl = URL.createObjectURL(file);
-        setMediaUrl(localUrl);
+        finalUrl = URL.createObjectURL(file);
       } else {
         const data = await res.json();
-        setMediaUrl(data.url || URL.createObjectURL(file));
+        finalUrl = data.url || URL.createObjectURL(file);
+      }
+
+      if (activeComposerTab === "all") {
+        setMediaUrl(finalUrl);
+      } else {
+        setPlatformOverrides((prev) => ({
+          ...prev,
+          [activeComposerTab]: {
+            ...prev[activeComposerTab],
+            mediaUrl: finalUrl,
+          },
+        }));
       }
     } catch (err) {
       console.warn("Upload fallback used:", err);
-      setMediaUrl(URL.createObjectURL(file));
+      const fallbackUrl = URL.createObjectURL(file);
+      if (activeComposerTab === "all") {
+        setMediaUrl(fallbackUrl);
+      } else {
+        setPlatformOverrides((prev) => ({
+          ...prev,
+          [activeComposerTab]: {
+            ...prev[activeComposerTab],
+            mediaUrl: fallbackUrl,
+          },
+        }));
+      }
     } finally {
       setUploading(false);
     }
   };
 
   const addHashtag = (tag) => {
-    if (!description.includes(tag)) {
-      setDescription(prev => prev ? `${prev} ${tag}` : tag);
+    if (activeComposerTab === "all") {
+      if (!description.includes(tag)) {
+        setDescription((prev) => (prev ? `${prev} ${tag}` : tag));
+      }
+    } else {
+      const currentDesc = platformOverrides[activeComposerTab]?.description !== undefined
+        ? platformOverrides[activeComposerTab].description
+        : description;
+      if (!currentDesc.includes(tag)) {
+        setPlatformOverrides((prev) => ({
+          ...prev,
+          [activeComposerTab]: {
+            ...prev[activeComposerTab],
+            description: currentDesc ? `${currentDesc} ${tag}` : tag,
+          },
+        }));
+      }
     }
   };
 
   const handleSubmit = async (statusOverride = null, forceImmediate = false) => {
-    if (!mediaUrl) {
+    const hasAnyMedia = mediaUrl || Object.values(platformOverrides).some((o) => !!o.mediaUrl);
+    if (!hasAnyMedia) {
       setErrorMsg("Please upload or provide a media URL for your post.");
       return;
     }
@@ -384,9 +652,12 @@ export default function PostComposerModal({
         accountId: parseInt(accountId) || 101,
         accountName,
         platformAccountMap,
+        platformOverrides,
         title,
         description,
         tags,
+        customTag: customTag || null,
+        tagColor: tagColor || null,
         mediaUrl,
         privacy,
         scheduledAt: statusOverride === "draft" ? null : combinedScheduledAt,
@@ -427,22 +698,22 @@ export default function PostComposerModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/70 backdrop-blur-sm overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 dark:bg-black/80 backdrop-blur-sm overflow-hidden">
       <div 
-        className="relative w-full max-w-5xl bg-zinc-950 border border-zinc-800 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[88vh]"
+        className="relative w-full max-w-5xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh] text-slate-900 dark:text-white transition-colors"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Top Bar */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-800 bg-zinc-950">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-md bg-blue-600 text-white font-black text-sm flex items-center justify-center shadow-md shadow-blue-600/30">
+            <div className="w-8 h-8 rounded-md bg-[#612bd3] text-white font-black text-sm flex items-center justify-center shadow-md shadow-[#612bd3]/30">
               P
             </div>
             <div>
-              <h3 className="text-sm sm:text-base font-black text-white tracking-wide uppercase">
+              <h3 className="text-sm sm:text-base font-black text-slate-900 dark:text-white tracking-wide uppercase">
                 {initialPost ? "EDIT SCHEDULED POST" : "COMPOSE & SCHEDULE POST"}
               </h3>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-zinc-600 dark:text-zinc-400">
                 Multi-channel scheduling with real-time feed preview
               </p>
             </div>
@@ -454,16 +725,16 @@ export default function PostComposerModal({
               className={`px-3 py-1 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer border ${
                 aiWriterOpen
                   ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-violet-400/40 shadow-md shadow-violet-500/30"
-                  : "bg-gradient-to-r from-violet-600/15 to-indigo-600/15 text-violet-300 border-violet-500/30 hover:border-violet-500/60 hover:text-white"
+                  : "bg-gradient-to-r from-violet-600/15 to-indigo-600/15 text-violet-700 dark:text-violet-300 border-violet-500/30 hover:border-violet-500/60 hover:text-[#612bd3] dark:hover:text-white"
               }`}
             >
-              <FaMagic className="text-[10px] text-amber-300" />
+              <FaMagic className="text-[10px] text-amber-500 dark:text-amber-300" />
               <span>Write with AI</span>
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="w-7 h-7 rounded-md hover:bg-zinc-900 text-zinc-400 hover:text-zinc-200 flex items-center justify-center transition-colors cursor-pointer"
+              className="w-7 h-7 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 flex items-center justify-center transition-colors cursor-pointer"
             >
               <FiX className="text-sm" />
             </button>
@@ -471,7 +742,7 @@ export default function PostComposerModal({
         </div>
 
         {/* Modal Main Content - 2 Column Split */}
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-zinc-800">
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-zinc-200 dark:divide-zinc-800 bg-[#f8f9fa] dark:bg-zinc-950">
           {/* LEFT COLUMN: Composer Form (7 cols) */}
           <div className="lg:col-span-7 p-5 space-y-4 overflow-y-auto overflow-x-hidden max-h-[calc(88vh-110px)]">
             {/* AI Post Writer Assistant (Collapsible) */}
@@ -494,10 +765,10 @@ export default function PostComposerModal({
             <div className="space-y-2.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <label className="text-xs font-bold text-zinc-300 tracking-wider uppercase block">
+                  <label className="text-xs font-bold text-zinc-800 dark:text-zinc-300 tracking-wider uppercase block">
                     1. SELECT PUBLISHING CHANNELS
                   </label>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
                     {selectedPlatforms.length} {selectedPlatforms.length === 1 ? "channel" : "channels"} selected
                   </span>
                 </div>
@@ -506,15 +777,15 @@ export default function PostComposerModal({
                     <button
                       type="button"
                       onClick={selectAllPlatforms}
-                      className="text-blue-400 hover:text-blue-300 font-medium transition-colors cursor-pointer"
+                      className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors cursor-pointer"
                     >
                       Select All
                     </button>
-                    <span className="text-zinc-600">|</span>
+                    <span className="text-zinc-400 dark:text-zinc-600">|</span>
                     <button
                       type="button"
                       onClick={() => selectSinglePlatform(activePreviewPlatform)}
-                      className="text-zinc-400 hover:text-zinc-200 font-medium transition-colors cursor-pointer"
+                      className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 font-medium transition-colors cursor-pointer"
                     >
                       Only Current
                     </button>
@@ -524,9 +795,9 @@ export default function PostComposerModal({
 
               {connectedPlatforms.length === 0 ? (
                 /* Empty state when no channels are connected */
-                <div className="p-4 rounded-lg border border-dashed border-zinc-800 bg-zinc-900/30 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+                <div className="p-4 rounded-lg border border-dashed border-zinc-300 dark:border-zinc-800 bg-white dark:bg-zinc-900/30 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left shadow-2xs">
                   <div>
-                    <p className="text-xs font-semibold text-zinc-200">No social channels connected yet</p>
+                    <p className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">No social channels connected yet</p>
                     <p className="text-[11px] text-zinc-500">Connect your accounts to start scheduling and publishing posts.</p>
                   </div>
                   <button
@@ -556,22 +827,22 @@ export default function PostComposerModal({
                         onClick={() => togglePlatform(plat.key)}
                         className={`relative p-2.5 rounded-md border flex items-center justify-between gap-2 transition-all cursor-pointer select-none ${
                           isSelected
-                            ? `${plat.activeStyle} ${isCurrent ? "ring-1 ring-white/30" : ""}`
-                            : "border-zinc-800/80 bg-zinc-900/40 text-zinc-500 hover:border-zinc-700 hover:text-zinc-300"
+                            ? `${plat.activeStyle} ${isCurrent ? "ring-2 ring-[#612bd3] dark:ring-white/30" : ""}`
+                            : "border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/40 text-zinc-600 dark:text-zinc-500 hover:border-zinc-300 dark:hover:border-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-300 shadow-2xs"
                         }`}
                       >
                         <div className="flex items-center gap-2 min-w-0">
                           <div className="relative shrink-0">
-                            <div className={`w-7 h-7 rounded-full flex items-center justify-center ${isSelected ? "bg-white/10" : "bg-zinc-800/80"}`}>
+                            <div className={`w-7 h-7 rounded-full flex items-center justify-center ${isSelected ? "bg-white/10" : "bg-zinc-100 dark:bg-zinc-800/80"}`}>
                               <Icon className={`text-xs ${isSelected ? "text-current" : plat.color}`} />
                             </div>
-                            <span className="w-2 h-2 rounded-full bg-emerald-400 absolute -bottom-0.5 -right-0.5 ring-2 ring-zinc-950" />
+                            <span className="w-2 h-2 rounded-full bg-emerald-400 absolute -bottom-0.5 -right-0.5 ring-2 ring-white dark:ring-zinc-950" />
                           </div>
                           <div className="min-w-0">
-                            <div className="text-[11px] truncate font-bold text-zinc-100">
+                            <div className="text-[11px] truncate font-bold text-zinc-900 dark:text-zinc-100">
                               {plat.name}
                             </div>
-                            <div className="text-[10px] truncate text-zinc-400">
+                            <div className="text-[10px] truncate text-zinc-500 dark:text-zinc-400">
                               {accountLabel}
                             </div>
                           </div>
@@ -582,7 +853,7 @@ export default function PostComposerModal({
                               ✓
                             </span>
                           ) : (
-                            <span className="w-4 h-4 rounded-full border border-zinc-700 flex items-center justify-center" />
+                            <span className="w-4 h-4 rounded-full border border-zinc-300 dark:border-zinc-700 flex items-center justify-center" />
                           )}
                         </div>
                       </div>
@@ -593,9 +864,9 @@ export default function PostComposerModal({
                   <button
                     type="button"
                     onClick={() => setAddChannelModalOpen(true)}
-                    className="p-2.5 rounded-md border border-dashed border-zinc-800 hover:border-zinc-700 bg-zinc-900/30 hover:bg-zinc-900/60 text-zinc-400 hover:text-zinc-200 flex items-center justify-center gap-2 transition-all cursor-pointer group min-h-[50px]"
+                    className="p-2.5 rounded-md border border-dashed border-zinc-300 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-700 bg-white dark:bg-zinc-900/30 hover:bg-zinc-50 dark:hover:bg-zinc-900/60 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 flex items-center justify-center gap-2 transition-all cursor-pointer group min-h-[50px] shadow-2xs"
                   >
-                    <div className="w-6 h-6 rounded-full bg-zinc-800 group-hover:bg-zinc-700 flex items-center justify-center text-zinc-300 transition-colors">
+                    <div className="w-6 h-6 rounded-full bg-zinc-100 dark:bg-zinc-800 group-hover:bg-zinc-200 dark:group-hover:bg-zinc-700 flex items-center justify-center text-zinc-600 dark:text-zinc-300 transition-colors">
                       <FiPlus className="text-xs font-bold" />
                     </div>
                     <span className="text-[11px] font-semibold tracking-wide">
@@ -619,54 +890,149 @@ export default function PostComposerModal({
               });
 
               return (
-                <div className="p-2.5 rounded-md bg-zinc-900/50 border border-zinc-800 flex items-center justify-between gap-3 text-xs">
+                <div className="p-2.5 rounded-md bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 flex items-center justify-between gap-3 text-xs shadow-2xs">
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="text-zinc-400 text-[11px] font-medium shrink-0">Posting to {currentPlatformInfo.name} as:</span>
+                    <span className="text-zinc-600 dark:text-zinc-400 text-[11px] font-medium shrink-0">Posting to {currentPlatformInfo.name} as:</span>
                     {activePlatAccounts.length > 0 ? (
-                      <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-semibold truncate">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 animate-pulse" />
+                      <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[11px] font-semibold truncate">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 shrink-0 animate-pulse" />
                         <span className="truncate">{accountName}</span>
                       </div>
                     ) : (
-                      <span className="text-amber-400/90 text-[11px] font-medium flex items-center gap-1 truncate">
+                      <span className="text-amber-500 dark:text-amber-400/90 text-[11px] font-medium flex items-center gap-1 truncate">
                         ⚠️ No account connected in Integrations
                       </span>
                     )}
                   </div>
 
                   {activePlatAccounts.length > 1 && (
-                    <select
-                      value={accountId}
-                      onChange={(e) => {
-                        const sel = activePlatAccounts.find((a) => String(a.id) === e.target.value);
-                        if (sel) {
-                          setAccountId(String(sel.id));
-                          setAccountName(sel.account_name);
-                          setPlatformAccountMap((prev) => ({ ...prev, [activePreviewPlatform]: sel.id }));
-                        }
-                      }}
-                      className="bg-zinc-900 border border-zinc-800 rounded px-2 py-1 text-[11px] text-zinc-200 outline-none shrink-0"
-                    >
-                      {activePlatAccounts.map((a) => (
-                        <option key={a.id} value={a.id}>{a.account_name}</option>
-                      ))}
-                    </select>
+                    <div className="w-44 sm:w-48 shrink-0">
+                      <CustomSelect
+                        value={accountId}
+                        onChange={(val) => {
+                          const sel = activePlatAccounts.find((a) => String(a.id) === String(val));
+                          if (sel) {
+                            setAccountId(String(sel.id));
+                            setAccountName(sel.account_name);
+                            setPlatformAccountMap((prev) => ({ ...prev, [activePreviewPlatform]: sel.id }));
+                          }
+                        }}
+                        options={activePlatAccounts.map((a) => ({
+                          value: String(a.id),
+                          label: a.account_name,
+                        }))}
+                        size="sm"
+                      />
+                    </div>
                   )}
                 </div>
               );
             })()}
 
+            {/* Platform Caption & Media Overrides Tab Bar (Phase 2.2) */}
+            <div className="bg-white dark:bg-zinc-900/60 p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 shadow-2xs space-y-1.5">
+              <div className="flex items-center justify-between gap-2 px-1">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 shrink-0">
+                    Target Content:
+                  </span>
+                  {activeComposerTab === "all" ? (
+                    <span className="text-[11px] text-zinc-600 dark:text-zinc-400 truncate">
+                      Editing base post for all channels
+                    </span>
+                  ) : isCurrentTabOverridden ? (
+                    <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1.5 truncate">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shrink-0" />
+                      <span>Custom override active for {currentActivePlatformInfo.name}</span>
+                    </span>
+                  ) : (
+                    <span className="text-[11px] text-zinc-500 truncate">
+                      Syncing with All Channels (type below to customize for {currentActivePlatformInfo.name})
+                    </span>
+                  )}
+                </div>
+
+                {activeComposerTab !== "all" && isCurrentTabOverridden && (
+                  <button
+                    type="button"
+                    onClick={resetCurrentTabOverride}
+                    className="text-[10px] font-semibold text-zinc-500 hover:text-red-500 dark:text-zinc-400 dark:hover:text-red-400 transition-colors cursor-pointer flex items-center gap-1 shrink-0"
+                    title="Reset to All Channels content"
+                  >
+                    <FiRefreshCw className="text-[9px]" />
+                    <span>Reset to Base</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Tabs List */}
+              <div className="flex items-center gap-1 overflow-x-auto pb-0.5 scrollbar-thin">
+                <button
+                  type="button"
+                  onClick={() => setActiveComposerTab("all")}
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 select-none ${
+                    activeComposerTab === "all"
+                      ? "bg-[#612bd3] text-white shadow-xs font-bold"
+                      : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  }`}
+                >
+                  <span>🌐</span>
+                  <span>All Channels</span>
+                </button>
+
+                {selectedPlatforms.map((platKey) => {
+                  const plat = PLATFORMS.find((p) => p.key === platKey);
+                  if (!plat) return null;
+                  const Icon = plat.Icon;
+                  const isCurrent = activeComposerTab === platKey;
+                  const hasOverride = hasPlatformOverride(platKey);
+
+                  return (
+                    <button
+                      key={platKey}
+                      type="button"
+                      onClick={() => {
+                        setActiveComposerTab(platKey);
+                        setActivePreviewPlatform(platKey);
+                      }}
+                      className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 shrink-0 select-none relative ${
+                        isCurrent
+                          ? "bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 shadow-xs font-bold"
+                          : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-transparent"
+                      }`}
+                    >
+                      <Icon className={`text-xs ${isCurrent ? (platKey === "x_twitter" ? "text-sky-400" : plat.color) : plat.color}`} />
+                      <span>{plat.name}</span>
+                      {hasOverride && (
+                        <span
+                          className="w-2 h-2 rounded-full bg-amber-400 dark:bg-amber-300 ring-2 ring-white dark:ring-zinc-900 shrink-0"
+                          title="Customized override active"
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* 2. Post Title */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-zinc-300 tracking-wider uppercase block">
-                2. POST TITLE / HEADLINE
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-zinc-800 dark:text-zinc-300 tracking-wider uppercase block">
+                  2. POST TITLE / HEADLINE
+                </label>
+                {activeComposerTab !== "all" && platformOverrides[activeComposerTab]?.title !== undefined && (
+                  <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
+                    (Custom title for {currentActivePlatformInfo.name})
+                  </span>
+                )}
+              </div>
               <input
                 type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Give your post a strong, clickable title..."
-                className="w-full bg-zinc-900/60 border border-zinc-800 rounded-md px-3.5 py-2 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-600 transition-colors"
+                value={currentTabTitle}
+                onChange={(e) => handleTitleChange(e.target.value)}
+                placeholder={`Give your ${activeComposerTab !== "all" ? currentActivePlatformInfo.name : ""} post a strong, clickable title...`}
+                className="w-full bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-md px-3.5 py-2 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-[#612bd3] dark:focus:border-zinc-600 transition-colors shadow-2xs"
               />
             </div>
 
@@ -674,44 +1040,64 @@ export default function PostComposerModal({
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <label className="text-xs font-bold text-zinc-300 tracking-wider uppercase">
+                  <label className="text-xs font-bold text-zinc-800 dark:text-zinc-300 tracking-wider uppercase">
                     3. CAPTION & DETAILS
                   </label>
                   {!aiWriterOpen && (
                     <button
                       type="button"
                       onClick={() => setAiWriterOpen(true)}
-                      className="text-[11px] text-violet-400 hover:text-violet-300 font-medium flex items-center gap-1 transition-colors cursor-pointer"
+                      className="text-[11px] text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 font-medium flex items-center gap-1 transition-colors cursor-pointer"
                       title="Write post with AI"
                     >
-                      <FaMagic className="text-[9px] text-amber-300" />
+                      <FaMagic className="text-[9px] text-amber-500 dark:text-amber-300" />
                       <span>Write with AI</span>
                     </button>
                   )}
                 </div>
-                <span className={`text-[11px] font-mono ${currentChars > charLimit ? "text-red-400 font-semibold" : "text-zinc-500"}`}>
-                  {currentChars} / {charLimit}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className={`text-[11px] font-mono ${currentChars > currentTabCharLimit ? "text-red-500 font-bold" : "text-zinc-500 dark:text-zinc-400"}`}>
+                    {currentChars} / {currentTabCharLimit}
+                  </span>
+                  {activeComposerTab === "all" && selectedPlatforms.length > 1 && limitingPlatform && (
+                    <span className="text-[10px] text-zinc-500 font-sans hidden sm:inline">
+                      ({limitingPlatform.name} max)
+                    </span>
+                  )}
+                  {activeComposerTab !== "all" && (
+                    <span className="text-[10px] text-zinc-500 font-sans hidden sm:inline">
+                      ({currentActivePlatformInfo.name} max)
+                    </span>
+                  )}
+                </div>
               </div>
               <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                value={currentTabDescription}
+                onChange={(e) => handleDescriptionChange(e.target.value)}
                 rows={4}
-                placeholder="Write your caption, hook, call to action, and hashtags..."
-                className="w-full bg-zinc-900/60 border border-zinc-800 rounded-md p-3 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-600 transition-colors resize-none leading-relaxed"
+                placeholder={
+                  activeComposerTab !== "all"
+                    ? `Write custom caption specifically for ${currentActivePlatformInfo.name}...`
+                    : "Write your caption, hook, call to action, and hashtags..."
+                }
+                className={`w-full bg-white dark:bg-zinc-900/60 border rounded-md p-3 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none transition-colors resize-none leading-relaxed shadow-2xs ${
+                  currentChars > currentTabCharLimit
+                    ? "border-red-400 focus:border-red-500 ring-1 ring-red-400/30"
+                    : "border-zinc-200 dark:border-zinc-800 focus:border-[#612bd3] dark:focus:border-zinc-600"
+                }`}
               />
 
               {/* Hashtag Quick Chips */}
               <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-                <span className="text-[11px] text-zinc-400 flex items-center gap-1 mr-1 font-medium">
-                  <FaMagic className="text-violet-400 text-[10px]" /> Tags:
+                <span className="text-[11px] text-zinc-600 dark:text-zinc-400 flex items-center gap-1 mr-1 font-medium">
+                  <FaMagic className="text-violet-500 dark:text-violet-400 text-[10px]" /> Quick Tags:
                 </span>
                 {POPULAR_HASHTAGS.map((tag) => (
                   <button
                     key={tag}
                     type="button"
                     onClick={() => addHashtag(tag)}
-                    className="px-2 py-0.5 rounded bg-zinc-900/80 hover:bg-indigo-500/10 border border-zinc-800 hover:border-indigo-500/40 text-[11px] text-zinc-400 hover:text-indigo-300 transition-all cursor-pointer font-mono"
+                    className="px-2 py-0.5 rounded bg-white dark:bg-zinc-900/80 hover:bg-violet-50 dark:hover:bg-indigo-500/10 border border-zinc-200 dark:border-zinc-800 hover:border-violet-300 dark:hover:border-indigo-500/40 text-[11px] text-zinc-600 dark:text-zinc-400 hover:text-violet-700 dark:hover:text-indigo-300 transition-all cursor-pointer font-mono shadow-2xs"
                   >
                     {tag}
                   </button>
@@ -719,24 +1105,209 @@ export default function PostComposerModal({
               </div>
             </div>
 
-            {/* 4. Media Attachment */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-zinc-300 tracking-wider uppercase block">
-                4. MEDIA ATTACHMENT (VIDEO / IMAGE)
-              </label>
+            {/* 4. Custom Tag & Category Color Banner */}
+            <div className="space-y-2.5 p-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/30 shadow-xs">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-zinc-800 dark:text-zinc-300 tracking-wider uppercase flex items-center gap-1.5">
+                  <FiTag className="text-[#612bd3] dark:text-[#fc69ff]" />
+                  <span>4. CUSTOM TAG & COLOR BANNER</span>
+                </label>
+                {customTag && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCustomTag("");
+                      setTagColor("");
+                    }}
+                    className="text-[10px] text-zinc-500 hover:text-red-500 dark:text-zinc-400 dark:hover:text-red-400 transition-colors cursor-pointer"
+                  >
+                    Clear Tag
+                  </button>
+                )}
+              </div>
 
-              {mediaUrl ? (
-                <div className="relative rounded-md overflow-hidden border border-zinc-800 bg-black aspect-video max-h-44 group">
+              {/* Tag Selection Pills */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {/* Default platform color pill */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCustomTag("");
+                    setTagColor("");
+                  }}
+                  className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-all cursor-pointer border ${
+                    !customTag
+                      ? "bg-[#612bd3] text-white border-[#612bd3] shadow-xs font-bold"
+                      : "bg-zinc-100 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700"
+                  }`}
+                >
+                  Default (Platform Color)
+                </button>
+
+                {/* Available Tags */}
+                {availableTags.map((t) => {
+                  const isSelected = customTag?.toLowerCase() === t.name.toLowerCase();
+                  return (
+                    <div
+                      key={t.id || t.name}
+                      onClick={() => {
+                        setCustomTag(t.name);
+                        setTagColor(t.color);
+                      }}
+                      className={`group/tag px-2.5 py-1 rounded-full text-[11px] font-medium transition-all cursor-pointer border flex items-center gap-1.5 ${
+                        isSelected
+                          ? "text-white font-bold ring-2 shadow-sm"
+                          : "bg-zinc-100 dark:bg-zinc-900/70 text-zinc-800 dark:text-zinc-300 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:text-zinc-900 dark:hover:text-white"
+                      }`}
+                      style={{
+                        backgroundColor: isSelected ? t.color : undefined,
+                        borderColor: isSelected ? t.color : undefined,
+                        boxShadow: isSelected ? `0 0 10px ${t.color}40` : undefined,
+                      }}
+                    >
+                      <span
+                        className="w-2 h-2 rounded-full shrink-0"
+                        style={{ backgroundColor: t.color }}
+                      />
+                      <span>#{t.name}</span>
+                      {t.userId && (
+                        <button
+                          type="button"
+                          onClick={(e) => handleDeleteTag(e, t.id)}
+                          className="opacity-0 group-hover/tag:opacity-100 hover:text-red-300 text-zinc-400 transition-opacity ml-0.5"
+                          title="Delete tag"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {/* Add Custom Tag Button */}
+                {!isCreatingCustomTag && (
+                  <button
+                    type="button"
+                    onClick={() => setIsCreatingCustomTag(true)}
+                    className="px-2.5 py-1 rounded-full text-[11px] font-medium text-[#612bd3] dark:text-[#8c66ff] hover:text-white bg-[#612bd3]/10 hover:bg-[#612bd3] border border-[#612bd3]/30 transition-all cursor-pointer flex items-center gap-1"
+                  >
+                    <FaPlus className="text-[9px]" />
+                    <span>New Tag</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Inline Tag Creator Form */}
+              {isCreatingCustomTag && (
+                <div className="mt-2.5 p-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/70 space-y-3 shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Create Custom Tag</span>
+                    <button
+                      type="button"
+                      onClick={() => setIsCreatingCustomTag(false)}
+                      className="text-zinc-400 hover:text-zinc-800 dark:hover:text-white text-xs cursor-pointer"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={newTagName}
+                      onChange={(e) => setNewTagName(e.target.value)}
+                      placeholder="Tag name (e.g. Launch, Promo, Meme)..."
+                      className="flex-1 bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-md px-3 py-1.5 text-xs text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-[#612bd3]"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleCreateTag();
+                        }
+                      }}
+                    />
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <input
+                        type="color"
+                        value={newTagColor}
+                        onChange={(e) => setNewTagColor(e.target.value)}
+                        className="w-7 h-7 rounded border-0 bg-transparent cursor-pointer"
+                        title="Pick custom color"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleCreateTag}
+                        disabled={!newTagName.trim()}
+                        className="px-3 py-1.5 rounded-md bg-[#612bd3] hover:bg-[#7237e8] disabled:opacity-40 text-white text-xs font-semibold cursor-pointer transition-colors shadow-2xs"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Preset Color Swatches */}
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] text-zinc-500 mr-1">Palette:</span>
+                    {TAG_COLOR_PALETTE.map((c) => (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => setNewTagColor(c)}
+                        className={`w-5 h-5 rounded-full transition-transform cursor-pointer border ${
+                          newTagColor === c ? "scale-110 border-white ring-2 ring-violet-500" : "border-transparent hover:scale-105"
+                        }`}
+                        style={{ backgroundColor: c }}
+                        title={c}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 5. Media Attachment */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-zinc-800 dark:text-zinc-300 tracking-wider uppercase block">
+                  5. MEDIA ATTACHMENT (VIDEO / IMAGE)
+                </label>
+                {activeComposerTab !== "all" && (
+                  <div className="flex items-center gap-1.5 text-[10px]">
+                    {currentTabHasMediaOverride ? (
+                      <>
+                        <span className="text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                          Custom {currentActivePlatformInfo.name} Media
+                        </span>
+                        <button
+                          type="button"
+                          onClick={resetCurrentTabMediaOverride}
+                          className="text-zinc-500 hover:text-red-500 dark:text-zinc-400 dark:hover:text-red-400 transition-colors cursor-pointer underline ml-1"
+                          title="Revert to All Channels media"
+                        >
+                          Use Base Media
+                        </button>
+                      </>
+                    ) : (
+                      <span className="text-zinc-500 dark:text-zinc-400">
+                        Using All Channels media
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {currentTabMediaUrl ? (
+                <div className="relative rounded-md overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-black aspect-video max-h-44 group shadow-2xs">
                   <img
-                    src={mediaUrl}
+                    src={currentTabMediaUrl}
                     alt="Media preview"
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                     <button
                       type="button"
-                      onClick={() => setMediaUrl("")}
-                      className="px-3 py-1.5 rounded-md bg-red-600/90 hover:bg-red-600 text-white text-xs font-medium flex items-center gap-1.5 cursor-pointer"
+                      onClick={() => handleMediaUrlChange("")}
+                      className="px-3 py-1.5 rounded-md bg-red-600/90 hover:bg-red-600 text-white text-xs font-medium flex items-center gap-1.5 cursor-pointer shadow-sm"
                     >
                       <FiTrash2 /> Remove
                     </button>
@@ -746,14 +1317,18 @@ export default function PostComposerModal({
                 <div className="space-y-2">
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="border border-dashed border-zinc-800 hover:border-zinc-700 bg-zinc-900/20 hover:bg-zinc-900/40 rounded-md p-4 text-center cursor-pointer transition-colors flex flex-col items-center justify-center gap-1.5"
+                    className="border border-dashed border-zinc-300 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-700 bg-white dark:bg-zinc-900/20 hover:bg-zinc-50 dark:hover:bg-zinc-900/40 rounded-md p-4 text-center cursor-pointer transition-colors flex flex-col items-center justify-center gap-1.5 shadow-2xs"
                   >
-                    <div className="w-8 h-8 rounded-full bg-zinc-800/80 text-zinc-400 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800/80 text-zinc-500 dark:text-zinc-400 flex items-center justify-center">
                       <FiUploadCloud className="text-base" />
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-zinc-300">
-                        {uploading ? "Uploading..." : "Click or drag & drop video/image"}
+                      <p className="text-xs font-medium text-zinc-800 dark:text-zinc-300">
+                        {uploading
+                          ? "Uploading..."
+                          : activeComposerTab !== "all"
+                          ? `Upload custom media for ${currentActivePlatformInfo.name}`
+                          : "Click or drag & drop video/image"}
                       </p>
                       <p className="text-[10px] text-zinc-500 mt-0.5">
                         MP4, MOV, JPG, PNG up to 100MB
@@ -769,13 +1344,17 @@ export default function PostComposerModal({
                   </div>
 
                   <div className="relative">
-                    <FiLink className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-xs" />
+                    <FiLink className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 text-xs" />
                     <input
                       type="url"
-                      value={mediaUrl}
-                      onChange={(e) => setMediaUrl(e.target.value)}
-                      placeholder="Or paste media URL directly (https://...)"
-                      className="w-full bg-zinc-900/40 border border-zinc-800 rounded-md pl-8 pr-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-zinc-600 transition-colors"
+                      value={currentTabMediaUrl}
+                      onChange={(e) => handleMediaUrlChange(e.target.value)}
+                      placeholder={
+                        activeComposerTab !== "all"
+                          ? `Or paste custom media URL for ${currentActivePlatformInfo.name} (https://...)`
+                          : "Or paste media URL directly (https://...)"
+                      }
+                      className="w-full bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-md pl-8 pr-3 py-1.5 text-xs text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-[#612bd3] dark:focus:border-zinc-600 transition-colors shadow-2xs"
                     />
                   </div>
                 </div>
@@ -783,20 +1362,22 @@ export default function PostComposerModal({
             </div>
 
             {/* Platform Specific Settings Accordion */}
-            <div className="border border-zinc-800 rounded-md overflow-hidden bg-zinc-900/20">
+            <div className={`border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-900/20 shadow-2xs relative ${advancedOpen ? "z-30" : "overflow-hidden"}`}>
               <button
                 type="button"
                 onClick={() => setAdvancedOpen(!advancedOpen)}
-                className="w-full px-3.5 py-2.5 flex items-center justify-between text-xs font-medium text-zinc-300 hover:text-zinc-100 transition-colors cursor-pointer"
+                className={`w-full px-3.5 py-2.5 flex items-center justify-between text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer ${
+                  advancedOpen ? "rounded-t-md" : "rounded-md"
+                }`}
               >
                 <span>Settings for {currentPlatformInfo.name}</span>
                 {advancedOpen ? <FaChevronUp className="text-[10px]" /> : <FaChevronDown className="text-[10px]" />}
               </button>
 
               {advancedOpen && (
-                <div className="p-3.5 pt-2 border-t border-zinc-800 space-y-3">
+                <div className="p-3.5 pt-2 border-t border-zinc-200 dark:border-zinc-800 space-y-3">
                   {selectedPlatforms.length > 1 && (
-                    <div className="flex items-center gap-1.5 pb-2 border-b border-zinc-800/80 overflow-x-auto">
+                    <div className="flex items-center gap-1.5 pb-2 border-b border-zinc-200 dark:border-zinc-800/80 overflow-x-auto">
                       <span className="text-[10px] text-zinc-500 uppercase font-bold mr-1 shrink-0">Configure:</span>
                       {selectedPlatforms.map((pKey) => {
                         const plat = PLATFORMS.find(p => p.key === pKey);
@@ -809,8 +1390,8 @@ export default function PostComposerModal({
                             onClick={() => setActivePreviewPlatform(pKey)}
                             className={`px-2 py-0.5 rounded text-[10px] font-medium flex items-center gap-1 transition-colors shrink-0 cursor-pointer ${
                               isCurrent
-                                ? "bg-zinc-800 text-white font-bold border border-zinc-700"
-                                : "text-zinc-400 hover:text-zinc-200 bg-zinc-900/60"
+                                ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white font-bold border border-zinc-300 dark:border-zinc-700"
+                                : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 bg-zinc-50 dark:bg-zinc-900/60"
                             }`}
                           >
                             {Icon && <Icon className={`text-[9px] ${plat.color}`} />}
@@ -824,32 +1405,26 @@ export default function PostComposerModal({
                   {activePreviewPlatform === "youtube" && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
-                        <label className="text-[11px] font-medium text-zinc-400 block mb-1">
+                        <label className="text-[11px] font-medium text-zinc-700 dark:text-zinc-400 block mb-1">
                           Category
                         </label>
-                        <select
+                        <CustomSelect
                           value={categoryId}
-                          onChange={(e) => setCategoryId(e.target.value)}
-                          className="w-full bg-zinc-900 border border-zinc-800 rounded-md px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-700"
-                        >
-                          {YOUTUBE_CATEGORIES.map((c) => (
-                            <option key={c.value} value={c.value}>{c.label}</option>
-                          ))}
-                        </select>
+                          onChange={(val) => setCategoryId(val)}
+                          options={YOUTUBE_CATEGORIES}
+                          size="sm"
+                        />
                       </div>
                       <div>
-                        <label className="text-[11px] font-medium text-zinc-400 block mb-1">
+                        <label className="text-[11px] font-medium text-zinc-700 dark:text-zinc-400 block mb-1">
                           Privacy
                         </label>
-                        <select
+                        <CustomSelect
                           value={privacy}
-                          onChange={(e) => setPrivacy(e.target.value)}
-                          className="w-full bg-zinc-900 border border-zinc-800 rounded-md px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-700"
-                        >
-                          <option value="public">Public</option>
-                          <option value="unlisted">Unlisted</option>
-                          <option value="private">Private</option>
-                        </select>
+                          onChange={(val) => setPrivacy(val)}
+                          options={YOUTUBE_PRIVACY_OPTIONS}
+                          size="sm"
+                        />
                       </div>
                       <div className="sm:col-span-2 flex items-center gap-2 pt-1">
                         <input
@@ -857,9 +1432,9 @@ export default function PostComposerModal({
                           id="kids"
                           checked={madeForKids}
                           onChange={(e) => setMadeForKids(e.target.checked)}
-                          className="rounded border-zinc-700 bg-zinc-900 text-blue-500 focus:ring-0"
+                          className="rounded border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-[#612bd3] focus:ring-0"
                         />
-                        <label htmlFor="kids" className="text-xs text-zinc-400">
+                        <label htmlFor="kids" className="text-xs text-zinc-600 dark:text-zinc-400 cursor-pointer">
                           Made for Kids (COPPA compliant)
                         </label>
                       </div>
@@ -868,31 +1443,31 @@ export default function PostComposerModal({
 
                   {activePreviewPlatform === "tiktok" && (
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between text-xs text-zinc-300">
+                      <div className="flex items-center justify-between text-xs text-zinc-700 dark:text-zinc-300">
                         <span>Disable Comments</span>
                         <input
                           type="checkbox"
                           checked={disableComment}
                           onChange={(e) => setDisableComment(e.target.checked)}
-                          className="rounded border-zinc-700 bg-zinc-900 text-blue-500"
+                          className="rounded border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-[#612bd3]"
                         />
                       </div>
-                      <div className="flex items-center justify-between text-xs text-zinc-300">
+                      <div className="flex items-center justify-between text-xs text-zinc-700 dark:text-zinc-300">
                         <span>Disable Duet</span>
                         <input
                           type="checkbox"
                           checked={disableDuet}
                           onChange={(e) => setDisableDuet(e.target.checked)}
-                          className="rounded border-zinc-700 bg-zinc-900 text-blue-500"
+                          className="rounded border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-[#612bd3]"
                         />
                       </div>
-                      <div className="flex items-center justify-between text-xs text-zinc-300">
+                      <div className="flex items-center justify-between text-xs text-zinc-700 dark:text-zinc-300">
                         <span>Disable Stitch</span>
                         <input
                           type="checkbox"
                           checked={disableStitch}
                           onChange={(e) => setDisableStitch(e.target.checked)}
-                          className="rounded border-zinc-700 bg-zinc-900 text-blue-500"
+                          className="rounded border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-[#612bd3]"
                         />
                       </div>
                     </div>
@@ -901,25 +1476,23 @@ export default function PostComposerModal({
                   {activePreviewPlatform === "instagram" && (
                     <div className="space-y-3">
                       <div>
-                        <label className="text-[11px] font-medium text-zinc-400 block mb-1">
+                        <label className="text-[11px] font-medium text-zinc-700 dark:text-zinc-400 block mb-1">
                           Placement
                         </label>
-                        <select
+                        <CustomSelect
                           value={placement}
-                          onChange={(e) => setPlacement(e.target.value)}
-                          className="w-full bg-zinc-900 border border-zinc-800 rounded-md px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-700"
-                        >
-                          <option value="reels">Reels</option>
-                          <option value="feed">Feed Post</option>
-                        </select>
+                          onChange={(val) => setPlacement(val)}
+                          options={INSTAGRAM_PLACEMENT_OPTIONS}
+                          size="sm"
+                        />
                       </div>
-                      <div className="flex items-center justify-between text-xs text-zinc-300">
+                      <div className="flex items-center justify-between text-xs text-zinc-700 dark:text-zinc-300">
                         <span>Share Reels to Main Feed</span>
                         <input
                           type="checkbox"
                           checked={shareToFeed}
                           onChange={(e) => setShareToFeed(e.target.checked)}
-                          className="rounded border-zinc-700 bg-zinc-900 text-pink-500"
+                          className="rounded border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-pink-500"
                         />
                       </div>
                     </div>
@@ -928,17 +1501,15 @@ export default function PostComposerModal({
                   {activePreviewPlatform === "facebook" && (
                     <div className="space-y-2">
                       <div>
-                        <label className="text-[11px] font-medium text-zinc-400 block mb-1">
+                        <label className="text-[11px] font-medium text-zinc-700 dark:text-zinc-400 block mb-1">
                           Placement
                         </label>
-                        <select
+                        <CustomSelect
                           value={placement}
-                          onChange={(e) => setPlacement(e.target.value)}
-                          className="w-full bg-zinc-900 border border-zinc-800 rounded-md px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-700"
-                        >
-                          <option value="timeline">Timeline Post</option>
-                          <option value="reels">Facebook Reels</option>
-                        </select>
+                          onChange={(val) => setPlacement(val)}
+                          options={FACEBOOK_PLACEMENT_OPTIONS}
+                          size="sm"
+                        />
                       </div>
                     </div>
                   )}
@@ -946,18 +1517,15 @@ export default function PostComposerModal({
                   {activePreviewPlatform === "x_twitter" && (
                     <div className="space-y-2">
                       <div>
-                        <label className="text-[11px] font-medium text-zinc-400 block mb-1">
+                        <label className="text-[11px] font-medium text-zinc-700 dark:text-zinc-400 block mb-1">
                           Who can reply
                         </label>
-                        <select
+                        <CustomSelect
                           value={replySettings}
-                          onChange={(e) => setReplySettings(e.target.value)}
-                          className="w-full bg-zinc-900 border border-zinc-800 rounded-md px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-700"
-                        >
-                          <option value="everyone">Everyone</option>
-                          <option value="following">Accounts you follow</option>
-                          <option value="mentionedUsers">Only accounts you mention</option>
-                        </select>
+                          onChange={(val) => setReplySettings(val)}
+                          options={X_REPLY_OPTIONS}
+                          size="sm"
+                        />
                       </div>
                     </div>
                   )}
@@ -965,7 +1533,7 @@ export default function PostComposerModal({
                   {activePreviewPlatform === "pinterest" && (
                     <div className="space-y-3">
                       <div>
-                        <label className="text-[11px] font-medium text-zinc-400 block mb-1">
+                        <label className="text-[11px] font-medium text-zinc-700 dark:text-zinc-400 block mb-1">
                           Destination Link
                         </label>
                         <input
@@ -973,11 +1541,11 @@ export default function PostComposerModal({
                           value={destinationLink}
                           onChange={(e) => setDestinationLink(e.target.value)}
                           placeholder="https://yourwebsite.com/pin-link"
-                          className="w-full bg-zinc-900 border border-zinc-800 rounded-md px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-700"
+                          className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-md px-2.5 py-1.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#612bd3] dark:focus:border-zinc-700 shadow-2xs"
                         />
                       </div>
                       <div>
-                        <label className="text-[11px] font-medium text-zinc-400 block mb-1">
+                        <label className="text-[11px] font-medium text-zinc-700 dark:text-zinc-400 block mb-1">
                           Board ID / Name (Optional)
                         </label>
                         <input
@@ -985,14 +1553,14 @@ export default function PostComposerModal({
                           value={boardId}
                           onChange={(e) => setBoardId(e.target.value)}
                           placeholder="Default Board or ID"
-                          className="w-full bg-zinc-900 border border-zinc-800 rounded-md px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-700"
+                          className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-md px-2.5 py-1.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#612bd3] dark:focus:border-zinc-700 shadow-2xs"
                         />
                       </div>
                     </div>
                   )}
 
                   {(activePreviewPlatform === "linkedin" || activePreviewPlatform === "threads") && (
-                    <p className="text-xs text-zinc-400">
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
                       Standard optimization and formatting will be automatically applied for {currentPlatformInfo.name}.
                     </p>
                   )}
@@ -1000,21 +1568,21 @@ export default function PostComposerModal({
               )}
             </div>
 
-            {/* 5. Scheduling Controls */}
-            <div className="p-3.5 bg-zinc-900/40 border border-zinc-800 rounded-md space-y-2.5">
+            {/* 6. Scheduling Controls */}
+            <div className="p-3.5 bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-md space-y-2.5 shadow-2xs">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
-                  <FiCalendar className="text-zinc-400 text-xs" />
-                  <span className="text-xs font-bold text-zinc-300 tracking-wider uppercase">
-                    5. SCHEDULE & PUBLISH OPTIONS
+                  <FiCalendar className="text-zinc-500 dark:text-zinc-400 text-xs" />
+                  <span className="text-xs font-bold text-zinc-800 dark:text-zinc-300 tracking-wider uppercase">
+                    6. SCHEDULE & PUBLISH OPTIONS
                   </span>
                 </div>
-                <div className="flex items-center bg-zinc-900 p-0.5 rounded-md border border-zinc-800 text-xs">
+                <div className="flex items-center bg-zinc-100 dark:bg-zinc-900 p-0.5 rounded-md border border-zinc-200 dark:border-zinc-800 text-xs">
                   <button
                     type="button"
                     onClick={() => setIsScheduled(false)}
                     className={`px-2.5 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${
-                      !isScheduled ? "bg-zinc-800 text-white" : "text-zinc-400 hover:text-white"
+                      !isScheduled ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-2xs font-bold" : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
                     }`}
                   >
                     Post Now
@@ -1023,7 +1591,7 @@ export default function PostComposerModal({
                     type="button"
                     onClick={() => setIsScheduled(true)}
                     className={`px-2.5 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${
-                      isScheduled ? "bg-zinc-800 text-white" : "text-zinc-400 hover:text-white"
+                      isScheduled ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-2xs font-bold" : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
                     }`}
                   >
                     Schedule
@@ -1034,21 +1602,21 @@ export default function PostComposerModal({
               {isScheduled && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
                   <div className="relative">
-                    <FiCalendar className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-xs" />
+                    <FiCalendar className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 text-xs" />
                     <input
                       type="date"
                       value={scheduledDate}
                       onChange={(e) => setScheduledDate(e.target.value)}
-                      className="w-full bg-zinc-900/60 border border-zinc-800 rounded-md pl-8 pr-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-600"
+                      className="w-full bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-md pl-8 pr-2.5 py-1.5 text-xs text-zinc-900 dark:text-zinc-200 focus:outline-none focus:border-[#612bd3] dark:focus:border-zinc-600 shadow-2xs"
                     />
                   </div>
                   <div className="relative">
-                    <FiClock className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-xs" />
+                    <FiClock className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 text-xs" />
                     <input
                       type="time"
                       value={scheduledTime}
                       onChange={(e) => setScheduledTime(e.target.value)}
-                      className="w-full bg-zinc-900/60 border border-zinc-800 rounded-md pl-8 pr-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-600"
+                      className="w-full bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-md pl-8 pr-2.5 py-1.5 text-xs text-zinc-900 dark:text-zinc-200 focus:outline-none focus:border-[#612bd3] dark:focus:border-zinc-600 shadow-2xs"
                     />
                   </div>
                 </div>
@@ -1057,26 +1625,34 @@ export default function PostComposerModal({
           </div>
 
           {/* RIGHT COLUMN: Real-Time Live Feed Mockup (5 cols) */}
-          <div className="lg:col-span-5 p-4 sm:p-5 bg-zinc-950/40 flex flex-col overflow-y-auto overflow-x-hidden max-h-[calc(88vh-110px)]">
+          <div className="lg:col-span-5 p-4 sm:p-5 bg-zinc-50 dark:bg-zinc-950/40 border-l border-zinc-200 dark:border-zinc-800/80 flex flex-col overflow-y-auto overflow-x-hidden max-h-[calc(88vh-110px)]">
             <LiveDevicePreview
               platform={activePreviewPlatform}
               selectedPlatforms={selectedPlatforms}
-              onSelectPlatform={(plat) => setActivePreviewPlatform(plat)}
-              title={title}
-              description={description}
-              tags={tags}
-              mediaUrl={mediaUrl}
+              onSelectPlatform={(plat) => {
+                setActivePreviewPlatform(plat);
+                if (activeComposerTab !== "all") {
+                  setActiveComposerTab(plat);
+                }
+              }}
+              title={getEffectiveContent(activePreviewPlatform).title}
+              description={getEffectiveContent(activePreviewPlatform).description}
+              tags={getEffectiveContent(activePreviewPlatform).tags}
+              customTag={customTag}
+              tagColor={tagColor}
+              mediaUrl={getEffectiveContent(activePreviewPlatform).mediaUrl}
               accountName={accountName}
+              overriddenPlatforms={Object.keys(platformOverrides).filter(hasPlatformOverride)}
             />
           </div>
         </div>
 
         {/* Modal Bottom Bar / Actions */}
-        <div className="flex items-center justify-between px-5 py-3 border-t border-zinc-800 bg-zinc-950">
+        <div className="flex items-center justify-between px-5 py-3 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
           <button
             type="button"
             onClick={onClose}
-            className="px-3.5 py-1.5 rounded-md text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors cursor-pointer"
+            className="px-3.5 py-1.5 rounded-md text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors cursor-pointer"
           >
             Cancel
           </button>
@@ -1086,7 +1662,7 @@ export default function PostComposerModal({
               type="button"
               disabled={submitting}
               onClick={() => handleSubmit("draft")}
-              className="px-3.5 py-1.5 rounded-md text-xs font-bold text-zinc-300 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 transition-colors cursor-pointer"
+              className="px-3.5 py-1.5 rounded-md text-xs font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-300 dark:border-zinc-800 transition-colors cursor-pointer shadow-2xs"
             >
               Save as Draft
             </button>
@@ -1097,9 +1673,9 @@ export default function PostComposerModal({
                   type="button"
                   disabled={submitting}
                   onClick={() => handleSubmit(null, true)}
-                  className="px-3.5 py-1.5 rounded-md text-xs font-bold text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 transition-colors cursor-pointer flex items-center gap-1.5"
+                  className="px-3.5 py-1.5 rounded-md text-xs font-bold text-zinc-700 dark:text-zinc-200 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
                 >
-                  <FiSend className="text-xs text-blue-400" />
+                  <FiSend className="text-xs text-blue-500" />
                   <span>Publish Now Instead</span>
                 </button>
                 <button

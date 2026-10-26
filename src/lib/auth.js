@@ -70,7 +70,7 @@ export const authOptions = {
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET || "postiz-cheap-fallback-secret-2025",
+  secret: process.env.NEXTAUTH_SECRET || "free-ai-social-media-scheduler-fallback-secret-2025",
   pages: {
     signIn: "/login",
   },
