@@ -48,7 +48,7 @@ export default function GalleryPage() {
   });
 
   return (
-    <main className="flex-1 min-h-screen bg-zinc-950 px-6 py-12 flex flex-col items-center">
+    <div className="w-full max-w-7xl mx-auto px-4 py-8 sm:px-6 flex flex-col items-center">
       <div className="max-w-6xl w-full flex flex-col gap-8">
         
         {/* Header section */}
@@ -250,6 +250,6 @@ export default function GalleryPage() {
           </>
         )}
       </div>
-    </main>
+    </div>
   );
 }

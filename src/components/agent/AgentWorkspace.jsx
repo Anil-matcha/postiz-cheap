@@ -637,7 +637,7 @@ export default function AgentWorkspace() {
   }
 
   return (
-    <div className="h-[calc(100vh-68px)] max-h-[calc(100vh-68px)] w-full bg-[#0c0c0e] text-zinc-100 flex flex-col overflow-hidden">
+    <div className="h-full w-full bg-[#0c0c0e] text-zinc-100 flex flex-col overflow-hidden">
       {/* 3-Panel Main Layout matching reference app proportions */}
       <div className="flex-1 h-full min-h-0 flex overflow-hidden divide-x divide-zinc-800/80">
         

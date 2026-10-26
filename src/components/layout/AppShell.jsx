@@ -135,7 +135,7 @@ export default function AppShell({ children }) {
   const credits = session?.user?.credits ?? 10;
 
   return (
-    <div className="flex h-screen w-screen bg-[#0e0e0e] text-[#ffffff] p-2 sm:p-2.5 font-sans overflow-hidden select-none">
+    <div className="fixed inset-0 flex bg-[#0e0e0e] text-[#ffffff] p-2 sm:p-2.5 font-sans overflow-hidden select-none">
       {/* Mobile Backdrop */}
       {mobileMenuOpen && (
         <div
@@ -147,7 +147,7 @@ export default function AppShell({ children }) {
       <div className="flex gap-2 sm:gap-2.5 w-full h-full min-h-0 overflow-hidden">
         {/* Left Navigation Rail */}
         <aside
-          className={`fixed md:static inset-y-0 left-0 z-50 md:z-auto flex flex-col justify-between items-center w-[74px] h-full shrink-0 bg-[#1a1919] border border-[#252525] rounded-[14px] py-3.5 transition-transform duration-200 overflow-hidden ${
+          className={`fixed md:static inset-y-0 left-0 z-40 md:z-auto flex flex-col justify-between items-center w-[74px] h-full shrink-0 bg-[#1a1919] border border-[#252525] rounded-[14px] py-3.5 transition-transform duration-200 ${
             mobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
           }`}
         >
@@ -197,6 +197,7 @@ export default function AppShell({ children }) {
             {status === "authenticated" ? (
               <div className="relative flex flex-col items-center">
                 <button
+                  type="button"
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                   className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#612bd3] to-[#d82d7e] p-0.5 transition-transform hover:scale-105 cursor-pointer shadow-md shadow-[#612bd3]/30"
                   title={session?.user?.name || session?.user?.email}
@@ -213,33 +214,10 @@ export default function AppShell({ children }) {
                     </div>
                   )}
                 </button>
-
-                {profileDropdownOpen && (
-                  <div className="absolute left-16 bottom-0 w-48 bg-[#1a1919] border border-[#252525] rounded-[12px] shadow-2xl p-2 z-50 flex flex-col gap-1">
-                    <div className="px-3 py-2 border-b border-[#252525] text-xs">
-                      <p className="font-semibold text-white truncate">{session?.user?.name || "Creator"}</p>
-                      <p className="text-[#999999] text-[10px] truncate">{session?.user?.email}</p>
-                    </div>
-                    <Link
-                      href="/pricing"
-                      className="flex items-center gap-2 px-3 py-2 text-xs text-[#999999] hover:text-white hover:bg-[#242323] rounded-lg transition-colors"
-                      onClick={() => setProfileDropdownOpen(false)}
-                    >
-                      <FiCreditCard className="text-amber-400" />
-                      <span>{credits} Credits</span>
-                    </Link>
-                    <button
-                      onClick={() => signOut()}
-                      className="flex items-center gap-2 px-3 py-2 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer w-full text-left"
-                    >
-                      <FiLogOut />
-                      <span>Sign Out</span>
-                    </button>
-                  </div>
-                )}
               </div>
             ) : (
               <button
+                type="button"
                 onClick={() => signIn("google")}
                 className="w-9 h-9 rounded-full bg-[#252525] hover:bg-[#612bd3] text-white flex items-center justify-center transition-colors cursor-pointer"
                 title="Sign in with Google"
@@ -351,6 +329,110 @@ export default function AppShell({ children }) {
           </main>
         </div>
       </div>
+
+      {/* Floating Profile Modal / Popover */}
+      {status === "authenticated" && profileDropdownOpen && (
+        <div className="fixed inset-0 z-50 pointer-events-none">
+          {/* Click-outside Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-[1px] pointer-events-auto"
+            onClick={() => setProfileDropdownOpen(false)}
+          />
+
+          {/* Profile Modal Card */}
+          <div
+            className="fixed left-[84px] sm:left-[88px] bottom-3.5 z-50 pointer-events-auto w-72 bg-[#1a1919] border border-[#2e2d2d] rounded-2xl shadow-2xl p-4 flex flex-col gap-3.5 text-white animate-in fade-in zoom-in-95 duration-150"
+          >
+            {/* User Header */}
+            <div className="flex items-center gap-3 pb-3 border-b border-[#282727]">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#612bd3] to-[#d82d7e] p-0.5 shrink-0 shadow-md shadow-[#612bd3]/30">
+                {session?.user?.image ? (
+                  <img
+                    src={session.user.image}
+                    alt="User avatar"
+                    className="w-full h-full rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full rounded-full bg-[#1a1919] flex items-center justify-center text-xs font-bold text-white">
+                    {session?.user?.name?.charAt(0) || "U"}
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-col min-w-0">
+                <p className="font-bold text-sm text-white truncate">
+                  {session?.user?.name || "Creator"}
+                </p>
+                <p className="text-[11px] text-[#999999] truncate">
+                  {session?.user?.email}
+                </p>
+              </div>
+            </div>
+
+            {/* Credits Card */}
+            <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#212020] border border-[#2d2c2c]">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-amber-400/15 border border-amber-400/30 text-amber-400 flex items-center justify-center text-xs">
+                  <FiDollarSign />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-[#999999] uppercase font-bold tracking-wider leading-none">Credits</span>
+                  <span className="text-sm font-mono font-bold text-white leading-tight">{credits} Available</span>
+                </div>
+              </div>
+              <Link
+                href="/pricing"
+                onClick={() => setProfileDropdownOpen(false)}
+                className="px-2.5 py-1 text-[11px] font-bold text-amber-400 hover:text-amber-300 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 rounded-lg transition-colors"
+              >
+                Top Up
+              </Link>
+            </div>
+
+            {/* Quick Navigation Links */}
+            <div className="flex flex-col gap-1">
+              <Link
+                href="/integrations"
+                onClick={() => setProfileDropdownOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-[#cccccc] hover:text-white hover:bg-[#252424] transition-colors"
+              >
+                <FiShare2 className="text-[#8c66ff]" />
+                <span>Connected Channels</span>
+              </Link>
+              <Link
+                href="/gallery"
+                onClick={() => setProfileDropdownOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-[#cccccc] hover:text-white hover:bg-[#252424] transition-colors"
+              >
+                <FiImage className="text-pink-400" />
+                <span>Media Library</span>
+              </Link>
+              <Link
+                href="/pricing"
+                onClick={() => setProfileDropdownOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-[#cccccc] hover:text-white hover:bg-[#252424] transition-colors"
+              >
+                <FiCreditCard className="text-amber-400" />
+                <span>Pricing Plans</span>
+              </Link>
+            </div>
+
+            {/* Sign Out Button */}
+            <div className="pt-2 border-t border-[#282727]">
+              <button
+                type="button"
+                onClick={() => {
+                  setProfileDropdownOpen(false);
+                  signOut({ callbackUrl: "/login" });
+                }}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors cursor-pointer text-left"
+              >
+                <FiLogOut className="text-sm" />
+                <span>Sign Out</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

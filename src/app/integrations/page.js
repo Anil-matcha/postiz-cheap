@@ -293,7 +293,7 @@ export default function IntegrationsPage() {
     );
 
   return (
-    <main className="flex-1 overflow-y-auto bg-zinc-950 px-6 py-12 min-h-screen">
+    <div className="w-full max-w-7xl mx-auto px-4 py-8 sm:px-6">
       
       {/* Connect Platform Modal */}
       {connectingPlatform && (
@@ -543,6 +543,6 @@ export default function IntegrationsPage() {
           })}
         </div>
       </div>
-    </main>
+    </div>
   );
 }

@@ -42,10 +42,10 @@ export default function Pricing() {
   };
 
   return (
-    <div className="flex min-h-dvh flex-col bg-bg-page select-none text-primary-text overflow-hidden">
+    <div className="w-full max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 flex flex-col gap-8 items-center select-none text-white">
       <Toaster position="top-right" />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-12 sm:px-6 lg:px-8 flex flex-col gap-10 overflow-y-auto scrollbar-subtle items-center">
+      <div className="w-full flex flex-col gap-8 items-center">
         <div className="text-center space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full mb-1">
             <FaInfoCircle className="text-primary text-xs" />
@@ -112,9 +112,7 @@ export default function Pricing() {
             </div>
           ))}
         </div>
-      </main>
-
-      <Footer />
+      </div>
     </div>
   );
 }
