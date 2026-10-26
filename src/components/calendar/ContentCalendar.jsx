@@ -152,8 +152,25 @@ export default function ContentCalendar({
     }
   }, [viewMode, now]);
 
+  // Global drag cleanup to ensure cards never stay stuck in dragging/disabled appearance
+  useEffect(() => {
+    const handleDragCleanup = () => {
+      setDraggedPostId(null);
+      setDragOverKey(null);
+    };
+    window.addEventListener("dragend", handleDragCleanup);
+    window.addEventListener("drop", handleDragCleanup);
+    return () => {
+      window.removeEventListener("dragend", handleDragCleanup);
+      window.removeEventListener("drop", handleDragCleanup);
+    };
+  }, []);
+
   // Drag and Drop rescheduling handlers
   const handleDropOnMonthDay = async (postId, targetDate) => {
+    setDraggedPostId(null);
+    setDragOverKey(null);
+
     const post = posts.find((p) => p.id === postId);
     if (!post) return;
 
@@ -176,6 +193,9 @@ export default function ContentCalendar({
   };
 
   const handleDropOnWeekSlot = async (postId, targetDate, targetHour) => {
+    setDraggedPostId(null);
+    setDragOverKey(null);
+
     const post = posts.find((p) => p.id === postId);
     if (!post) return;
 
@@ -195,6 +215,9 @@ export default function ContentCalendar({
   };
 
   const handleDropOnDaySlot = async (postId, targetHour) => {
+    setDraggedPostId(null);
+    setDragOverKey(null);
+
     const post = posts.find((p) => p.id === postId);
     if (!post) return;
 
@@ -763,6 +786,7 @@ export default function ContentCalendar({
                     onDrop={(e) => {
                       e.preventDefault();
                       setDragOverKey(null);
+                      setDraggedPostId(null);
                       const postId = e.dataTransfer.getData("text/plain");
                       if (postId) {
                         handleDropOnMonthDay(postId, item.date);
@@ -933,6 +957,7 @@ export default function ContentCalendar({
                           onDrop={(e) => {
                             e.preventDefault();
                             setDragOverKey(null);
+                            setDraggedPostId(null);
                             const postId = e.dataTransfer.getData("text/plain");
                             if (postId) {
                               handleDropOnWeekSlot(postId, d, hour);
@@ -1059,6 +1084,7 @@ export default function ContentCalendar({
                     onDrop={(e) => {
                       e.preventDefault();
                       setDragOverKey(null);
+                      setDraggedPostId(null);
                       const postId = e.dataTransfer.getData("text/plain");
                       if (postId) {
                         handleDropOnDaySlot(postId, hour);
@@ -1310,7 +1336,7 @@ function CalendarItemCard({
         onPostClick?.(post);
       }}
       className={`rounded-[10px] overflow-hidden border border-zinc-200 dark:border-[#282828] bg-white dark:bg-[#1c1c1c] hover:border-zinc-300 dark:hover:border-[#383838] transition-all shadow-xs group/card relative cursor-grab active:cursor-grabbing select-none ${
-        isDragging ? "opacity-30 scale-95 ring-2 ring-[#612bd3]" : ""
+        isDragging ? "opacity-50 scale-[0.98] ring-2 ring-[#612bd3] shadow-md" : ""
       } ${
         isError
           ? "ring-1 ring-red-500"
