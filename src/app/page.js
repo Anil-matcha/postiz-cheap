@@ -194,25 +194,25 @@ export default function WorkspaceDashboard() {
   // Unauthenticated Welcome View
   if (status === "unauthenticated") {
     return (
-      <div className="min-h-[85vh] flex flex-col items-center justify-center px-4 py-16 bg-zinc-950 text-zinc-100">
+      <div className="min-h-[85vh] flex flex-col items-center justify-center px-4 py-16 bg-[#f8f9fa] dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 transition-colors duration-200">
         <div className="max-w-2xl text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 text-xs font-medium">
-            <FaRocket className="text-[11px] text-zinc-300" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-medium shadow-xs">
+            <FaRocket className="text-[11px] text-[#612bd3] dark:text-zinc-300" />
             <span>Social Media Scheduling Studio</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight text-zinc-100 leading-tight">
+          <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-slate-900 dark:text-zinc-100 leading-tight">
             Schedule, preview & publish across all your channels
           </h1>
 
-          <p className="text-xs sm:text-sm text-zinc-400 max-w-lg mx-auto leading-relaxed">
+          <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 max-w-lg mx-auto leading-relaxed">
             Manage YouTube, TikTok, Instagram, X (Twitter), and LinkedIn from a clean interactive content calendar with real-time feed previews.
           </p>
 
           <div className="flex items-center justify-center pt-2">
             <button
               onClick={() => signIn("google")}
-              className="px-5 py-2.5 rounded-lg bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-medium transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+              className="px-5 py-2.5 rounded-lg bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-slate-900 dark:text-white border border-zinc-300 dark:border-zinc-700 text-xs font-semibold transition-all flex items-center justify-center gap-2.5 cursor-pointer shadow-sm hover:shadow active:scale-98"
             >
               <FaGoogle className="text-xs text-red-500" />
               <span>Continue with Google</span>
@@ -221,38 +221,38 @@ export default function WorkspaceDashboard() {
 
           {/* Feature Highlights Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-10 text-left">
-            <div className="p-4 rounded-lg bg-zinc-900/40 border border-zinc-800/80 space-y-1.5">
-              <div className="w-8 h-8 rounded-md bg-zinc-800/60 text-zinc-300 flex items-center justify-center text-xs">
+            <div className="p-4 rounded-lg bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/80 space-y-1.5 shadow-xs dark:shadow-none transition-colors">
+              <div className="w-8 h-8 rounded-md bg-[#612bd3]/10 dark:bg-zinc-800/60 text-[#612bd3] dark:text-zinc-300 flex items-center justify-center text-xs">
                 <FaCalendarAlt />
               </div>
-              <h4 className="text-xs font-medium text-zinc-200">
+              <h4 className="text-xs font-semibold text-slate-900 dark:text-zinc-200">
                 Content Calendar
               </h4>
-              <p className="text-[11px] text-zinc-400 leading-relaxed">
+              <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
                 Month & week views with slot clicking and multi-channel post tracking.
               </p>
             </div>
 
-            <div className="p-4 rounded-lg bg-zinc-900/40 border border-zinc-800/80 space-y-1.5">
-              <div className="w-8 h-8 rounded-md bg-zinc-800/60 text-zinc-300 flex items-center justify-center text-xs">
+            <div className="p-4 rounded-lg bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/80 space-y-1.5 shadow-xs dark:shadow-none transition-colors">
+              <div className="w-8 h-8 rounded-md bg-purple-500/10 dark:bg-zinc-800/60 text-purple-600 dark:text-zinc-300 flex items-center justify-center text-xs">
                 <FaShareAlt />
               </div>
-              <h4 className="text-xs font-medium text-zinc-200">
+              <h4 className="text-xs font-semibold text-slate-900 dark:text-zinc-200">
                 Live Feed Mockups
               </h4>
-              <p className="text-[11px] text-zinc-400 leading-relaxed">
+              <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
                 Real-time previews for YouTube, TikTok, Instagram, X, and LinkedIn.
               </p>
             </div>
 
-            <div className="p-4 rounded-lg bg-zinc-900/40 border border-zinc-800/80 space-y-1.5">
-              <div className="w-8 h-8 rounded-md bg-zinc-800/60 text-zinc-300 flex items-center justify-center text-xs">
+            <div className="p-4 rounded-lg bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/80 space-y-1.5 shadow-xs dark:shadow-none transition-colors">
+              <div className="w-8 h-8 rounded-md bg-pink-500/10 dark:bg-zinc-800/60 text-pink-600 dark:text-zinc-300 flex items-center justify-center text-xs">
                 <FaRocket />
               </div>
-              <h4 className="text-xs font-medium text-zinc-200">
+              <h4 className="text-xs font-semibold text-slate-900 dark:text-zinc-200">
                 Automated Publishing
               </h4>
-              <p className="text-[11px] text-zinc-400 leading-relaxed">
+              <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
                 Scheduled background queues publish automatically to connected accounts.
               </p>
             </div>
@@ -267,48 +267,48 @@ export default function WorkspaceDashboard() {
       {/* 4 Stat Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {/* Card 1: Scheduled */}
-        <div className="p-3.5 rounded-[12px] bg-[#1a1919] border border-[#252525] flex items-center justify-between shadow-sm">
+        <div className="p-3.5 rounded-[12px] bg-white dark:bg-[#1a1919] border border-zinc-200 dark:border-[#252525] flex items-center justify-between shadow-xs dark:shadow-sm transition-colors">
           <div className="space-y-0.5">
-            <span className="text-[10px] font-bold text-[#999999] tracking-wider uppercase">
+            <span className="text-[10px] font-bold text-zinc-500 dark:text-[#999999] tracking-wider uppercase">
               SCHEDULED
             </span>
-            <p className="text-2xl font-bold text-[#8c66ff] font-mono">
+            <p className="text-2xl font-bold text-[#612bd3] dark:text-[#8c66ff] font-mono">
               {scheduledCount}
             </p>
           </div>
-          <div className="w-8 h-8 rounded-lg bg-[#612bd3]/15 border border-[#612bd3]/30 text-[#8c66ff] flex items-center justify-center text-xs shadow-sm">
+          <div className="w-8 h-8 rounded-lg bg-[#612bd3]/15 border border-[#612bd3]/30 text-[#612bd3] dark:text-[#8c66ff] flex items-center justify-center text-xs shadow-xs">
             <FaClock />
           </div>
         </div>
 
         {/* Card 2: Published */}
-        <div className="p-3.5 rounded-[12px] bg-[#1a1919] border border-[#252525] flex items-center justify-between shadow-sm">
+        <div className="p-3.5 rounded-[12px] bg-white dark:bg-[#1a1919] border border-zinc-200 dark:border-[#252525] flex items-center justify-between shadow-xs dark:shadow-sm transition-colors">
           <div className="space-y-0.5">
-            <span className="text-[10px] font-bold text-[#999999] tracking-wider uppercase">
+            <span className="text-[10px] font-bold text-zinc-500 dark:text-[#999999] tracking-wider uppercase">
               PUBLISHED
             </span>
-            <p className="text-2xl font-bold text-emerald-400 font-mono">
+            <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 font-mono">
               {publishedCount}
             </p>
           </div>
-          <div className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-xs shadow-sm">
+          <div className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs shadow-xs">
             <FaCheckCircle />
           </div>
         </div>
 
         {/* Card 3: Connected Channels */}
-        <div className="p-3.5 rounded-[12px] bg-[#1a1919] border border-[#252525] flex items-center justify-between shadow-sm">
+        <div className="p-3.5 rounded-[12px] bg-white dark:bg-[#1a1919] border border-zinc-200 dark:border-[#252525] flex items-center justify-between shadow-xs dark:shadow-sm transition-colors">
           <div className="space-y-0.5">
-            <span className="text-[10px] font-bold text-[#999999] tracking-wider uppercase">
+            <span className="text-[10px] font-bold text-zinc-500 dark:text-[#999999] tracking-wider uppercase">
               CONNECTED CHANNELS
             </span>
             <div className="flex items-baseline gap-2">
-              <p className="text-2xl font-bold text-purple-400 font-mono">
+              <p className="text-2xl font-bold text-purple-600 dark:text-purple-400 font-mono">
                 {connectedAccounts.length > 0 ? connectedAccounts.length : uniqueChannels}
               </p>
               <Link
                 href="/integrations"
-                className="text-[11px] font-medium text-purple-400 hover:text-purple-300 hover:underline"
+                className="text-[11px] font-medium text-purple-600 dark:text-purple-400 hover:underline"
               >
                 + Add
               </Link>
@@ -316,7 +316,7 @@ export default function WorkspaceDashboard() {
           </div>
           <Link
             href="/integrations"
-            className="w-8 h-8 rounded-lg bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-purple-400 flex items-center justify-center text-xs shadow-sm transition-colors"
+            className="w-8 h-8 rounded-lg bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xs shadow-xs transition-colors"
             title="Manage Connected Channels"
           >
             <FaShareAlt />
@@ -324,18 +324,18 @@ export default function WorkspaceDashboard() {
         </div>
 
         {/* Card 4: Credits Balance */}
-        <div className="p-3.5 rounded-[12px] bg-[#1a1919] border border-[#252525] flex items-center justify-between shadow-sm">
+        <div className="p-3.5 rounded-[12px] bg-white dark:bg-[#1a1919] border border-zinc-200 dark:border-[#252525] flex items-center justify-between shadow-xs dark:shadow-sm transition-colors">
           <div className="space-y-0.5">
-            <span className="text-[10px] font-bold text-[#999999] tracking-wider uppercase">
+            <span className="text-[10px] font-bold text-zinc-500 dark:text-[#999999] tracking-wider uppercase">
               CREDITS BALANCE
             </span>
-            <p className="text-2xl font-bold text-amber-400 font-mono">
+            <p className="text-2xl font-bold text-amber-500 dark:text-amber-400 font-mono">
               {userCredits}
             </p>
           </div>
           <Link
             href="/pricing"
-            className="px-3 py-1 rounded-md text-xs font-semibold text-amber-300 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 transition-all shadow-sm"
+            className="px-3 py-1 rounded-md text-xs font-semibold text-amber-600 dark:text-amber-300 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 transition-all shadow-xs"
           >
             Top Up
           </Link>
@@ -353,37 +353,37 @@ export default function WorkspaceDashboard() {
       {/* Post Details / Quick Actions Modal */}
       {viewingPost && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm"
           onClick={() => setViewingPost(null)}
         >
           <div 
-            className="w-full max-w-md bg-[#1a1919] border border-[#252525] rounded-[14px] p-5 shadow-2xl space-y-4"
+            className="w-full max-w-md bg-white dark:bg-[#1a1919] border border-zinc-200 dark:border-[#252525] rounded-[14px] p-5 shadow-2xl space-y-4 text-slate-900 dark:text-white transition-colors"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-[#252525]">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-[#252525]">
               <div className="flex items-center gap-2">
                 <span className={`px-2.5 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider ${
-                  viewingPost.platform === "youtube" ? "bg-red-500/20 text-red-400 border border-red-500/30" :
-                  viewingPost.platform === "instagram" ? "bg-pink-500/20 text-pink-400 border border-pink-500/30" :
-                  viewingPost.platform === "tiktok" ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30" :
-                  viewingPost.platform === "linkedin" ? "bg-blue-500/20 text-blue-400 border border-blue-500/30" :
-                  viewingPost.platform === "threads" ? "bg-purple-500/20 text-purple-400 border border-purple-500/30" :
-                  "bg-sky-500/20 text-sky-400 border border-sky-500/30"
+                  viewingPost.platform === "youtube" ? "bg-red-500/15 text-red-600 dark:text-red-400 border border-red-500/30" :
+                  viewingPost.platform === "instagram" ? "bg-pink-500/15 text-pink-600 dark:text-pink-400 border border-pink-500/30" :
+                  viewingPost.platform === "tiktok" ? "bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30" :
+                  viewingPost.platform === "linkedin" ? "bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30" :
+                  viewingPost.platform === "threads" ? "bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30" :
+                  "bg-sky-500/15 text-sky-600 dark:text-sky-400 border border-sky-500/30"
                 }`}>
                   {viewingPost.platform}
                 </span>
                 <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded ${
                   viewingPost.status === "completed" 
-                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" 
-                    : "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                    ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30" 
+                    : "bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30"
                 }`}>
                   {viewingPost.status}
                 </span>
               </div>
               <button
                 onClick={() => setViewingPost(null)}
-                className="text-zinc-400 hover:text-zinc-200 cursor-pointer"
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
               >
                 <FiX className="text-base" />
               </button>
@@ -391,7 +391,7 @@ export default function WorkspaceDashboard() {
 
             {/* Media & Title */}
             {viewingPost.mediaUrl && (
-              <div className="aspect-video rounded-lg overflow-hidden border border-zinc-800 bg-black">
+              <div className="aspect-video rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-black">
                 <img
                   src={viewingPost.mediaUrl}
                   alt="Post thumbnail"
@@ -401,34 +401,34 @@ export default function WorkspaceDashboard() {
             )}
 
             <div className="space-y-1.5">
-              <h3 className="text-sm font-semibold text-zinc-100">
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-zinc-100">
                 {viewingPost.title || "Untitled Post"}
               </h3>
-              <p className="text-xs text-zinc-400 leading-relaxed whitespace-pre-line">
+              <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed whitespace-pre-line">
                 {viewingPost.description || "No description provided."}
               </p>
               {viewingPost.tags && (
-                <p className="text-xs text-indigo-400 font-mono">
+                <p className="text-xs text-indigo-600 dark:text-indigo-400 font-mono">
                   {viewingPost.tags.split(",").map(t => `#${t.trim()}`).join(" ")}
                 </p>
               )}
             </div>
 
             {/* Scheduled Date Info */}
-            <div className="p-2.5 bg-zinc-900/60 rounded-lg border border-zinc-800 flex items-center justify-between text-xs">
-              <span className="text-zinc-400 flex items-center gap-1.5">
+            <div className="p-2.5 bg-zinc-50 dark:bg-zinc-900/60 rounded-lg border border-zinc-200 dark:border-zinc-800 flex items-center justify-between text-xs">
+              <span className="text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
                 <FaClock className="text-zinc-400 text-xs" />
                 Scheduled for:
               </span>
-              <span className="font-medium text-zinc-200 font-mono">
+              <span className="font-medium text-slate-800 dark:text-zinc-200 font-mono">
                 {viewingPost.scheduledAt ? new Date(viewingPost.scheduledAt).toLocaleString() : "Immediate"}
               </span>
             </div>
 
             {/* Error Banner if any */}
             {viewingPost.error && (
-              <div className="p-2.5 rounded-lg bg-red-500/10 border border-red-500/30 text-xs text-red-400 flex items-start gap-2">
-                <FaExclamationTriangle className="text-red-400 text-xs shrink-0 mt-0.5" />
+              <div className="p-2.5 rounded-lg bg-red-500/10 border border-red-500/30 text-xs text-red-600 dark:text-red-400 flex items-start gap-2">
+                <FaExclamationTriangle className="text-red-500 text-xs shrink-0 mt-0.5" />
                 <span className="leading-normal">{viewingPost.error}</span>
               </div>
             )}
@@ -439,7 +439,7 @@ export default function WorkspaceDashboard() {
                 type="button"
                 disabled={actionLoading}
                 onClick={() => handleDeletePost(viewingPost.id)}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="px-3 py-1.5 rounded-lg text-xs font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <FiTrash2 /> Delete
               </button>
@@ -461,7 +461,7 @@ export default function WorkspaceDashboard() {
                     href={viewingPost.publishedUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-300 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 transition-colors flex items-center gap-1.5"
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 transition-colors flex items-center gap-1.5"
                   >
                     <FiExternalLink /> View Live
                   </a>
@@ -469,7 +469,7 @@ export default function WorkspaceDashboard() {
                 <button
                   type="button"
                   onClick={() => handleEditPost(viewingPost)}
-                  className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-zinc-200 bg-zinc-800 hover:bg-zinc-700 transition-colors flex items-center gap-1.5 cursor-pointer active:scale-95"
+                  className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-transparent transition-colors flex items-center gap-1.5 cursor-pointer active:scale-95"
                 >
                   <FiEdit2 /> Edit
                 </button>

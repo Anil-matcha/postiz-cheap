@@ -42,17 +42,17 @@ export default function Pricing() {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 flex flex-col gap-8 items-center select-none text-white">
+    <div className="w-full max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 flex flex-col gap-8 items-center select-none text-slate-900 dark:text-white transition-colors duration-200">
       <Toaster position="top-right" />
 
       <div className="w-full flex flex-col gap-8 items-center">
         <div className="text-center space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full mb-1">
-            <FaInfoCircle className="text-primary text-xs" />
-            <span className="text-[10px] font-black text-primary uppercase tracking-widest">Pricing Plans</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#612bd3]/10 border border-[#612bd3]/20 rounded-full mb-1">
+            <FaInfoCircle className="text-[#612bd3] dark:text-[#8c66ff] text-xs" />
+            <span className="text-[10px] font-black text-[#612bd3] dark:text-[#8c66ff] uppercase tracking-widest">Pricing Plans</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight uppercase">Buy Credits Packs</h1>
-          <p className="text-xs sm:text-sm text-secondary-text max-w-lg leading-relaxed">
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight uppercase text-slate-900 dark:text-white">Buy Credits Packs</h1>
+          <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 max-w-lg leading-relaxed">
             Purchase flexible credit packages to perform high-resolution predictions. Keep all profits — we handle AI infrastructure.
           </p>
         </div>
@@ -62,39 +62,39 @@ export default function Pricing() {
           {PLANS.map((plan) => (
             <div
               key={plan.id}
-              className={`relative bg-bg-card border rounded-lg p-6 flex flex-col justify-between gap-6 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 ${
-                plan.popular ? "border-primary shadow-xl shadow-primary/5 scale-105" : "border-divider/50 shadow-md"
+              className={`relative bg-white dark:bg-[#1a1919] border rounded-xl p-6 flex flex-col justify-between gap-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
+                plan.popular ? "border-[#612bd3] dark:border-[#8c66ff] shadow-lg shadow-[#612bd3]/10 scale-105" : "border-zinc-200 dark:border-[#252525] shadow-xs"
               }`}
             >
               {plan.popular && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white text-[9px] font-black uppercase px-3 py-1 rounded-full tracking-wider shadow">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#612bd3] text-white text-[9px] font-black uppercase px-3 py-1 rounded-full tracking-wider shadow">
                   Most Popular
                 </span>
               )}
 
               <div className="space-y-4">
                 <div className="space-y-1">
-                  <h3 className="text-sm font-extrabold uppercase tracking-wide text-primary-text">{plan.name}</h3>
-                  <p className="text-2xl font-black tracking-tight text-white">{plan.price}</p>
+                  <h3 className="text-sm font-extrabold uppercase tracking-wide text-zinc-700 dark:text-zinc-300">{plan.name}</h3>
+                  <p className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">{plan.price}</p>
                 </div>
                 
-                <div className="text-xs bg-bg-page/50 border border-divider/30 p-3 rounded text-center font-extrabold text-primary">
+                <div className="text-xs bg-[#612bd3]/10 dark:bg-[#612bd3]/15 border border-[#612bd3]/20 dark:border-[#612bd3]/30 p-3 rounded-lg text-center font-extrabold text-[#612bd3] dark:text-[#8c66ff]">
                   {plan.credits} Art Credits
                 </div>
 
-                <p className="text-xs text-secondary-text leading-relaxed font-medium min-h-[3rem]">{plan.description}</p>
+                <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium min-h-[3rem]">{plan.description}</p>
                 
-                <ul className="space-y-2 border-t border-divider/30 pt-4 text-xs font-semibold text-secondary-text">
+                <ul className="space-y-2 border-t border-zinc-200 dark:border-[#252525] pt-4 text-xs font-semibold text-zinc-600 dark:text-zinc-400">
                   <li className="flex items-center gap-2">
-                    <FaCheck className="text-primary text-[10px]" />
+                    <FaCheck className="text-[#612bd3] dark:text-[#8c66ff] text-[10px]" />
                     <span>Dynamic aspect ratios</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <FaCheck className="text-primary text-[10px]" />
+                    <FaCheck className="text-[#612bd3] dark:text-[#8c66ff] text-[10px]" />
                     <span>HD image downloads</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <FaCheck className="text-primary text-[10px]" />
+                    <FaCheck className="text-[#612bd3] dark:text-[#8c66ff] text-[10px]" />
                     <span>No subscription required</span>
                   </li>
                 </ul>
@@ -103,8 +103,8 @@ export default function Pricing() {
               <button
                 onClick={() => handleCheckout(plan.id)}
                 disabled={loadingPlan !== null}
-                className={`w-full py-3 rounded-full text-xs font-bold transition-all shadow-md cursor-pointer select-none active:scale-[0.98] ${
-                  plan.popular ? "bg-primary text-white hover:bg-primary-hover shadow-primary/15" : "bg-bg-page hover:bg-bg-card text-primary-text border border-divider"
+                className={`w-full py-3 rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer select-none active:scale-[0.98] ${
+                  plan.popular ? "bg-[#612bd3] hover:bg-[#7237e8] text-white shadow-md shadow-[#612bd3]/25" : "bg-zinc-100 hover:bg-zinc-200 dark:bg-[#201f1f] dark:hover:bg-[#262525] text-slate-900 dark:text-white border border-zinc-200 dark:border-[#2e2d2d]"
                 }`}
               >
                 {loadingPlan === plan.id ? "Loading checkout..." : "Purchase Credits"}

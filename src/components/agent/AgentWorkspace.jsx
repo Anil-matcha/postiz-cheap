@@ -69,37 +69,37 @@ function FormattedMessage({ content }) {
   const cleaned = sanitizeText(content);
 
   return (
-    <div className="text-xs text-zinc-200 leading-relaxed break-words space-y-1.5">
+    <div className="text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed break-words space-y-1.5">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
           h1: ({ children }) => (
-            <h2 className="text-sm font-bold text-white mt-2.5 mb-1 tracking-wide">
+            <h2 className="text-sm font-bold text-zinc-900 dark:text-white mt-2.5 mb-1 tracking-wide">
               {children}
             </h2>
           ),
           h2: ({ children }) => (
-            <h3 className="text-xs font-bold text-white mt-2 mb-1">
+            <h3 className="text-xs font-bold text-zinc-900 dark:text-white mt-2 mb-1">
               {children}
             </h3>
           ),
           h3: ({ children }) => (
-            <h4 className="text-[11px] font-semibold text-zinc-300 mt-1.5 mb-1 uppercase tracking-wider">
+            <h4 className="text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mt-1.5 mb-1 uppercase tracking-wider">
               {children}
             </h4>
           ),
           p: ({ children }) => (
-            <p className="text-xs text-zinc-200 leading-relaxed my-1">
+            <p className="text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed my-1">
               {children}
             </p>
           ),
           strong: ({ children }) => (
-            <strong className="font-semibold text-white">
+            <strong className="font-semibold text-zinc-900 dark:text-white">
               {children}
             </strong>
           ),
           em: ({ children }) => (
-            <em className="italic text-zinc-300">
+            <em className="italic text-zinc-700 dark:text-zinc-300">
               {children}
             </em>
           ),
@@ -109,7 +109,7 @@ function FormattedMessage({ content }) {
             </ul>
           ),
           ol: ({ children }) => (
-            <ol className="space-y-1 my-1.5 pl-4 list-decimal text-zinc-200 text-xs">
+            <ol className="space-y-1 my-1.5 pl-4 list-decimal text-zinc-800 dark:text-zinc-200 text-xs">
               {children}
             </ol>
           ),
@@ -117,14 +117,14 @@ function FormattedMessage({ content }) {
             const isOrdered = node?.parent?.tagName === "ol";
             if (isOrdered) {
               return (
-                <li className="text-xs text-zinc-200 leading-relaxed my-0.5">
+                <li className="text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed my-0.5">
                   {children}
                 </li>
               );
             }
             return (
-              <li className="flex items-start gap-2 text-xs text-zinc-200 leading-relaxed my-0.5">
-                <span className="w-1 h-1 rounded-full bg-[#8c66ff] mt-2 shrink-0" />
+              <li className="flex items-start gap-2 text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed my-0.5">
+                <span className="w-1 h-1 rounded-full bg-[#612bd3] dark:bg-[#8c66ff] mt-2 shrink-0" />
                 <span className="flex-1">{children}</span>
               </li>
             );
@@ -132,46 +132,46 @@ function FormattedMessage({ content }) {
           code({ node, inline, className, children, ...props }) {
             const match = /language-(\w+)/.exec(className || "");
             return !inline ? (
-              <div className="my-2 rounded-md overflow-hidden border border-[#252525] bg-[#101012]">
+              <div className="my-2 rounded-md overflow-hidden border border-zinc-200 dark:border-[#252525] bg-zinc-100 dark:bg-[#101012]">
                 {match && (
-                  <div className="px-2.5 py-0.5 bg-[#18181b] border-b border-[#252525] text-[10px] font-mono text-zinc-400 uppercase tracking-wider">
+                  <div className="px-2.5 py-0.5 bg-zinc-200/80 dark:bg-[#18181b] border-b border-zinc-200 dark:border-[#252525] text-[10px] font-mono text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">
                     {match[1]}
                   </div>
                 )}
-                <pre className="p-2.5 overflow-x-auto text-xs font-mono text-zinc-300 leading-normal">
+                <pre className="p-2.5 overflow-x-auto text-xs font-mono text-zinc-800 dark:text-zinc-300 leading-normal">
                   <code>{children}</code>
                 </pre>
               </div>
             ) : (
-              <code className="px-1 py-0.2 rounded bg-[#201f1f] border border-[#2a2929] font-mono text-[11px] text-[#8c66ff]" {...props}>
+              <code className="px-1 py-0.2 rounded bg-zinc-100 dark:bg-[#201f1f] border border-zinc-200 dark:border-[#2a2929] font-mono text-[11px] text-[#612bd3] dark:text-[#8c66ff]" {...props}>
                 {children}
               </code>
             );
           },
           blockquote: ({ children }) => (
-            <blockquote className="border-l-2 border-[#612bd3] pl-2.5 py-0.5 my-1.5 text-xs italic text-zinc-400 bg-[#612bd3]/5 rounded-r">
+            <blockquote className="border-l-2 border-[#612bd3] pl-2.5 py-0.5 my-1.5 text-xs italic text-zinc-600 dark:text-zinc-400 bg-[#612bd3]/5 rounded-r">
               {children}
             </blockquote>
           ),
           table: ({ children }) => (
-            <div className="overflow-x-auto my-2 border border-[#252525] rounded-md">
-              <table className="min-w-full divide-y divide-[#252525] text-xs text-zinc-300">
+            <div className="overflow-x-auto my-2 border border-zinc-200 dark:border-[#252525] rounded-md">
+              <table className="min-w-full divide-y divide-zinc-200 dark:divide-[#252525] text-xs text-zinc-800 dark:text-zinc-300">
                 {children}
               </table>
             </div>
           ),
           th: ({ children }) => (
-            <th className="px-2.5 py-1.5 bg-[#1a1919] text-left font-semibold text-white text-xs">
+            <th className="px-2.5 py-1.5 bg-zinc-100 dark:bg-[#1a1919] text-left font-semibold text-zinc-900 dark:text-white text-xs">
               {children}
             </th>
           ),
           td: ({ children }) => (
-            <td className="px-2.5 py-1.5 border-t border-[#252525] text-zinc-300 text-xs">
+            <td className="px-2.5 py-1.5 border-t border-zinc-200 dark:border-[#252525] text-zinc-700 dark:text-zinc-300 text-xs">
               {children}
             </td>
           ),
           a: ({ children, href }) => (
-            <a href={href} className="text-[#8c66ff] hover:underline font-medium" target="_blank" rel="noopener noreferrer">
+            <a href={href} className="text-[#612bd3] dark:text-[#8c66ff] hover:underline font-medium" target="_blank" rel="noopener noreferrer">
               {children}
             </a>
           ),
@@ -196,11 +196,11 @@ function PostProposalCard({ proposal, index, total, onOpenComposer }) {
   };
 
   return (
-    <div className="p-3 rounded-md bg-[#181717] border border-[#262525] space-y-2">
-      <div className="flex items-center justify-between border-b border-[#252525] pb-1.5">
+    <div className="p-3 rounded-md bg-zinc-50 dark:bg-[#181717] border border-zinc-200 dark:border-[#262525] space-y-2 transition-colors">
+      <div className="flex items-center justify-between border-b border-zinc-200 dark:border-[#252525] pb-1.5">
         <div className="flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-          <span className="text-[10px] font-bold text-[#8c66ff] uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400" />
+          <span className="text-[10px] font-bold text-[#612bd3] dark:text-[#8c66ff] uppercase tracking-wider">
             {total > 1 ? `Proposal #${index + 1}` : "Proposed Post"}
           </span>
         </div>
@@ -211,7 +211,7 @@ function PostProposalCard({ proposal, index, total, onOpenComposer }) {
             return (
               <span
                 key={pKey}
-                className="p-1 rounded bg-[#201f1f] text-zinc-300"
+                className="p-1 rounded bg-zinc-200/70 dark:bg-[#201f1f] text-zinc-700 dark:text-zinc-300"
                 title={pInfo.name}
               >
                 <PIcon className="text-xs" />
@@ -223,10 +223,10 @@ function PostProposalCard({ proposal, index, total, onOpenComposer }) {
 
       {proposal.title && (
         <div>
-          <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider block">
+          <span className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">
             Title
           </span>
-          <p className="text-xs font-semibold text-white mt-0.5">
+          <p className="text-xs font-semibold text-zinc-900 dark:text-white mt-0.5">
             {proposal.title}
           </p>
         </div>
@@ -234,10 +234,10 @@ function PostProposalCard({ proposal, index, total, onOpenComposer }) {
 
       {proposal.description && (
         <div>
-          <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider block">
+          <span className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">
             Content
           </span>
-          <p className="text-xs text-zinc-300 mt-0.5 line-clamp-4 whitespace-pre-wrap">
+          <p className="text-xs text-zinc-700 dark:text-zinc-300 mt-0.5 line-clamp-4 whitespace-pre-wrap">
             {proposal.description}
           </p>
         </div>
@@ -245,21 +245,21 @@ function PostProposalCard({ proposal, index, total, onOpenComposer }) {
 
       {proposal.tags && (
         <div>
-          <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider block">
+          <span className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">
             Tags
           </span>
-          <p className="text-[11px] text-sky-400 font-mono mt-0.5">
+          <p className="text-[11px] text-sky-600 dark:text-sky-400 font-mono mt-0.5">
             {proposal.tags}
           </p>
         </div>
       )}
 
       {/* Action Row */}
-      <div className="pt-1.5 border-t border-[#252525] flex items-center justify-between gap-2">
+      <div className="pt-1.5 border-t border-zinc-200 dark:border-[#252525] flex items-center justify-between gap-2">
         <button
           type="button"
           onClick={() => setShowJson(!showJson)}
-          className="text-[11px] text-zinc-400 hover:text-white px-2 py-0.5 rounded bg-[#201f1f] hover:bg-[#262525] transition-colors cursor-pointer"
+          className="text-[11px] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white px-2 py-0.5 rounded bg-zinc-200/70 dark:bg-[#201f1f] hover:bg-zinc-300 dark:hover:bg-[#262525] transition-colors cursor-pointer"
         >
           {showJson ? "Hide JSON" : "JSON"}
         </button>
@@ -276,18 +276,18 @@ function PostProposalCard({ proposal, index, total, onOpenComposer }) {
 
       {/* Collapsible Raw JSON Display */}
       {showJson && (
-        <div className="mt-2 rounded bg-[#101012] border border-[#252525] p-2 relative">
-          <div className="flex items-center justify-between mb-1 text-[10px] font-mono text-zinc-400">
+        <div className="mt-2 rounded bg-zinc-100 dark:bg-[#101012] border border-zinc-200 dark:border-[#252525] p-2 relative">
+          <div className="flex items-center justify-between mb-1 text-[10px] font-mono text-zinc-600 dark:text-zinc-400">
             <span>Payload:</span>
             <button
               type="button"
               onClick={handleCopyJson}
-              className="text-[#8c66ff] hover:text-[#a082ff] text-[10px] font-semibold cursor-pointer"
+              className="text-[#612bd3] dark:text-[#8c66ff] hover:underline text-[10px] font-semibold cursor-pointer"
             >
               {copied ? "Copied" : "Copy"}
             </button>
           </div>
-          <pre className="text-[11px] font-mono text-zinc-300 overflow-x-auto leading-normal whitespace-pre">
+          <pre className="text-[11px] font-mono text-zinc-800 dark:text-zinc-300 overflow-x-auto leading-normal whitespace-pre">
             <code>{JSON.stringify(proposal, null, 2)}</code>
           </pre>
         </div>
@@ -616,13 +616,13 @@ export default function AgentWorkspace() {
 
   if (status === "unauthenticated") {
     return (
-      <div className="h-full flex flex-col items-center justify-center p-6 bg-[#141414] text-white">
+      <div className="h-full flex flex-col items-center justify-center p-6 bg-[#f8f9fa] dark:bg-[#141414] text-zinc-900 dark:text-white transition-colors">
         <div className="max-w-sm text-center space-y-3">
-          <div className="w-10 h-10 rounded-lg bg-[#1a1919] border border-[#252525] text-[#8c66ff] flex items-center justify-center mx-auto">
+          <div className="w-10 h-10 rounded-lg bg-white dark:bg-[#1a1919] border border-zinc-200 dark:border-[#252525] text-[#612bd3] dark:text-[#8c66ff] flex items-center justify-center mx-auto shadow-xs">
             <FaRobot className="text-lg" />
           </div>
           <h2 className="text-lg font-bold">Sign In to Use the Agent</h2>
-          <p className="text-xs text-[#999999]">
+          <p className="text-xs text-zinc-500 dark:text-[#999999]">
             Authenticate to access your connected social accounts and AI assistant.
           </p>
           <button
@@ -637,21 +637,21 @@ export default function AgentWorkspace() {
   }
 
   return (
-    <div className="h-full w-full bg-[#141414] text-zinc-100 flex flex-col overflow-hidden">
+    <div className="h-full w-full bg-[#f8f9fa] dark:bg-[#141414] text-zinc-900 dark:text-zinc-100 flex flex-col overflow-hidden transition-colors">
       {/* 3-Panel Main Layout */}
-      <div className="flex-1 h-full min-h-0 flex overflow-hidden divide-x divide-[#252525]">
+      <div className="flex-1 h-full min-h-0 flex overflow-hidden divide-x divide-zinc-200 dark:divide-[#252525]">
         
         {/* ========================================================= */}
         {/* LEFT SIDEBAR: Select Channels (w-[230px])                  */}
         {/* ========================================================= */}
-        <aside className="w-[230px] min-w-[230px] max-w-[230px] h-full bg-[#161515] flex flex-col shrink-0 select-none overflow-hidden">
+        <aside className="w-[230px] min-w-[230px] max-w-[230px] h-full bg-white dark:bg-[#161515] flex flex-col shrink-0 select-none overflow-hidden transition-colors">
           <div className="p-3.5 flex flex-col h-full min-h-0 overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between mb-3 shrink-0">
-              <h2 className="text-xs font-bold text-zinc-300 uppercase tracking-wider">
+              <h2 className="text-xs font-bold text-zinc-600 dark:text-zinc-300 uppercase tracking-wider">
                 Channels
               </h2>
-              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#612bd3]/15 text-[#8c66ff] border border-[#612bd3]/30">
+              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#612bd3]/10 dark:bg-[#612bd3]/15 text-[#612bd3] dark:text-[#8c66ff] border border-[#612bd3]/20 dark:border-[#612bd3]/30">
                 {selectedChannels.length} active
               </span>
             </div>
@@ -659,8 +659,8 @@ export default function AgentWorkspace() {
             {/* Channel List */}
             <div className="flex-1 min-h-0 overflow-y-auto space-y-1 pr-0.5">
               {accounts.length === 0 ? (
-                <div className="p-3 rounded-md bg-[#1a1919] border border-[#252525] text-center space-y-2 my-1">
-                  <p className="text-xs text-zinc-400">No channels connected.</p>
+                <div className="p-3 rounded-md bg-zinc-50 dark:bg-[#1a1919] border border-zinc-200 dark:border-[#252525] text-center space-y-2 my-1">
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">No channels connected.</p>
                   <Link
                     href="/integrations"
                     className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#612bd3] hover:bg-[#7237e8] text-white text-xs font-medium transition-colors"
@@ -683,8 +683,8 @@ export default function AgentWorkspace() {
                       onClick={() => toggleChannel(platKey)}
                       className={`px-2.5 py-2 rounded-md cursor-pointer transition-colors flex items-center justify-between text-xs border ${
                         isSelected
-                          ? "bg-[#201f1f] border-[#2e2d2d] text-white"
-                          : "bg-transparent border-transparent text-zinc-400 hover:text-zinc-200 hover:bg-[#1a1919]"
+                          ? "bg-[#612bd3]/10 dark:bg-[#201f1f] border-[#612bd3]/30 dark:border-[#2e2d2d] text-zinc-900 dark:text-white"
+                          : "bg-transparent border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-[#1a1919]"
                       }`}
                     >
                       <div className="flex items-center gap-2 min-w-0">
@@ -693,13 +693,13 @@ export default function AgentWorkspace() {
                           <div className="text-xs font-medium truncate">
                             {config.name}
                           </div>
-                          <div className="text-[10px] text-zinc-500 truncate">
+                          <div className="text-[10px] text-zinc-400 dark:text-zinc-500 truncate">
                             {acc.account_name || "Connected"}
                           </div>
                         </div>
                       </div>
                       {isSelected && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 shrink-0" />
                       )}
                     </div>
                   );
@@ -708,10 +708,10 @@ export default function AgentWorkspace() {
             </div>
 
             {/* Bottom Add Channel Button */}
-            <div className="pt-2.5 border-t border-[#252525] mt-auto shrink-0">
+            <div className="pt-2.5 border-t border-zinc-200 dark:border-[#252525] mt-auto shrink-0">
               <Link
                 href="/integrations"
-                className="w-full h-8 rounded-md border border-[#252525] hover:border-[#612bd3] text-zinc-400 hover:text-white text-xs font-medium flex items-center justify-center gap-1.5 transition-colors bg-[#1a1919] hover:bg-[#201f1f]"
+                className="w-full h-8 rounded-md border border-zinc-200 dark:border-[#252525] hover:border-[#612bd3] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white text-xs font-medium flex items-center justify-center gap-1.5 transition-colors bg-zinc-50 dark:bg-[#1a1919] hover:bg-zinc-100 dark:hover:bg-[#201f1f]"
               >
                 <FiPlus className="text-xs" />
                 <span>Add Channel</span>
@@ -723,34 +723,34 @@ export default function AgentWorkspace() {
         {/* ========================================================= */}
         {/* CENTER PANEL: Agent Chat                                  */}
         {/* ========================================================= */}
-        <main className="flex-1 h-full min-h-0 flex flex-col bg-[#141414] overflow-hidden relative">
+        <main className="flex-1 h-full min-h-0 flex flex-col bg-[#f8f9fa] dark:bg-[#141414] overflow-hidden relative transition-colors">
           {/* Top Bar */}
-          <div className="shrink-0 px-4 py-2.5 border-b border-[#252525] bg-[#161515] flex items-center justify-between">
+          <div className="shrink-0 px-4 py-2.5 border-b border-zinc-200 dark:border-[#252525] bg-white dark:bg-[#161515] flex items-center justify-between transition-colors">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-7 h-7 rounded-md bg-[#612bd3]/15 border border-[#612bd3]/30 flex items-center justify-center text-[#8c66ff] text-xs shrink-0">
+              <div className="w-7 h-7 rounded-md bg-[#612bd3]/10 dark:bg-[#612bd3]/15 border border-[#612bd3]/20 dark:border-[#612bd3]/30 flex items-center justify-center text-[#612bd3] dark:text-[#8c66ff] text-xs shrink-0">
                 <FaRobot />
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <h1 className="text-xs font-bold text-white uppercase tracking-wider">
+                  <h1 className="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-wider">
                     Marketing Agent
                   </h1>
-                  <span className="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
-                    <span className="w-1 h-1 rounded-full bg-emerald-400" />
+                  <span className="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                    <span className="w-1 h-1 rounded-full bg-emerald-500 dark:bg-emerald-400" />
                     Active
                   </span>
                 </div>
                 {/* Active Channel Pills */}
                 <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-                  <span className="text-[10px] text-zinc-500">Channels:</span>
+                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500">Channels:</span>
                   {selectedChannels.length === 0 ? (
-                    <span className="text-[10px] text-amber-400">None selected</span>
+                    <span className="text-[10px] text-amber-500 dark:text-amber-400">None selected</span>
                   ) : (
                     selectedChannels.map((k) => {
                       const p = PLATFORM_ICONS[k] || { name: k, Icon: FaShareAlt, color: "text-zinc-400" };
                       const PIcon = p.Icon;
                       return (
-                        <span key={k} className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-[#201f1f] text-[10px] text-zinc-300">
+                        <span key={k} className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-zinc-100 dark:bg-[#201f1f] text-[10px] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-transparent">
                           <PIcon className={`text-[8px] ${p.color}`} />
                           <span>{p.name}</span>
                         </span>
@@ -765,9 +765,9 @@ export default function AgentWorkspace() {
             <button
               type="button"
               onClick={handleNewThread}
-              className="px-2.5 py-1 rounded-md bg-[#201f1f] hover:bg-[#262525] border border-[#2e2d2d] text-xs font-medium text-zinc-200 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+              className="px-2.5 py-1 rounded-md bg-zinc-100 dark:bg-[#201f1f] hover:bg-zinc-200 dark:hover:bg-[#262525] border border-zinc-200 dark:border-[#2e2d2d] text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
             >
-              <FiPlus className="text-xs text-[#8c66ff]" />
+              <FiPlus className="text-xs text-[#612bd3] dark:text-[#8c66ff]" />
               <span>New Chat</span>
             </button>
           </div>
@@ -788,7 +788,7 @@ export default function AgentWorkspace() {
                         U
                       </div>
                     ) : (
-                      <div className="w-6 h-6 rounded-md bg-[#252525] text-[#8c66ff] flex items-center justify-center text-[10px]">
+                      <div className="w-6 h-6 rounded-md bg-zinc-200 dark:bg-[#252525] text-[#612bd3] dark:text-[#8c66ff] flex items-center justify-center text-[10px]">
                         <FaRobot />
                       </div>
                     )}
@@ -799,8 +799,8 @@ export default function AgentWorkspace() {
                     <div
                       className={`p-3 rounded-lg text-xs leading-relaxed ${
                         isUser
-                          ? "bg-[#612bd3] text-white"
-                          : "bg-[#1a1919] border border-[#252525] text-zinc-200"
+                          ? "bg-[#612bd3] text-white shadow-xs"
+                          : "bg-white dark:bg-[#1a1919] border border-zinc-200 dark:border-[#252525] text-zinc-800 dark:text-zinc-200 shadow-xs dark:shadow-none"
                       }`}
                     >
                       {isUser ? (
@@ -840,18 +840,18 @@ export default function AgentWorkspace() {
             {/* Thinking Indicator */}
             {isThinking && (
               <div className="flex gap-2.5 max-w-2xl mr-auto">
-                <div className="w-6 h-6 rounded-md bg-[#252525] text-[#8c66ff] flex items-center justify-center text-[10px] shrink-0">
+                <div className="w-6 h-6 rounded-md bg-zinc-200 dark:bg-[#252525] text-[#612bd3] dark:text-[#8c66ff] flex items-center justify-center text-[10px] shrink-0">
                   <FaRobot className="animate-spin" />
                 </div>
-                <div className="p-2.5 rounded-lg bg-[#1a1919] border border-[#252525] text-xs text-zinc-400 flex items-center gap-2">
-                  <div className="w-3 h-3 border-2 border-[#8c66ff] border-t-transparent rounded-full animate-spin" />
+                <div className="p-2.5 rounded-lg bg-white dark:bg-[#1a1919] border border-zinc-200 dark:border-[#252525] text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
+                  <div className="w-3 h-3 border-2 border-[#612bd3] dark:border-[#8c66ff] border-t-transparent rounded-full animate-spin" />
                   <span>Agent is thinking...</span>
                 </div>
               </div>
             )}
 
             {errorMsg && (
-              <div className="p-2.5 rounded-md bg-red-500/10 border border-red-500/20 text-xs text-red-400 flex items-center gap-2">
+              <div className="p-2.5 rounded-md bg-red-500/10 border border-red-500/20 text-xs text-red-500 dark:text-red-400 flex items-center gap-2">
                 <FiInfo className="text-sm shrink-0" />
                 <span>{errorMsg}</span>
               </div>
@@ -863,7 +863,7 @@ export default function AgentWorkspace() {
           {/* Quick Suggestions */}
           {messages.length <= 2 && (
             <div className="shrink-0 px-4 pb-2">
-              <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">
+              <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block mb-1">
                 Suggestions:
               </span>
               <div className="flex flex-wrap gap-1.5">
@@ -872,9 +872,9 @@ export default function AgentWorkspace() {
                     key={idx}
                     type="button"
                     onClick={() => handleSendMessage(suggestion)}
-                    className="px-2.5 py-1 rounded-md bg-[#1a1919] hover:bg-[#201f1f] border border-[#252525] text-[11px] text-zinc-300 hover:text-white transition-colors cursor-pointer text-left flex items-center gap-1.5"
+                    className="px-2.5 py-1 rounded-md bg-white dark:bg-[#1a1919] hover:bg-zinc-100 dark:hover:bg-[#201f1f] border border-zinc-200 dark:border-[#252525] text-[11px] text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer text-left flex items-center gap-1.5 shadow-xs"
                   >
-                    <FaBolt className="text-[9px] text-amber-400 shrink-0" />
+                    <FaBolt className="text-[9px] text-amber-500 dark:text-amber-400 shrink-0" />
                     <span className="truncate max-w-xs">{suggestion}</span>
                   </button>
                 ))}
@@ -883,13 +883,13 @@ export default function AgentWorkspace() {
           )}
 
           {/* Floating Input Box */}
-          <div className="shrink-0 p-3 border-t border-[#252525] bg-[#161515]">
+          <div className="shrink-0 p-3 border-t border-zinc-200 dark:border-[#252525] bg-white dark:bg-[#161515] transition-colors">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
                 handleSendMessage();
               }}
-              className="relative flex items-center bg-[#1a1919] border border-[#282727] rounded-lg focus-within:border-[#612bd3] transition-colors"
+              className="relative flex items-center bg-zinc-50 dark:bg-[#1a1919] border border-zinc-300 dark:border-[#282727] rounded-lg focus-within:border-[#612bd3] transition-colors"
             >
               <textarea
                 value={inputText}
@@ -902,7 +902,7 @@ export default function AgentWorkspace() {
                 }}
                 placeholder="Ask agent to write, strategize, or schedule posts (Enter to send)..."
                 rows={1}
-                className="w-full bg-transparent px-3 py-2 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none resize-none max-h-24 leading-normal"
+                className="w-full bg-transparent px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none resize-none max-h-24 leading-normal"
               />
               <div className="pr-2 flex items-center gap-1.5 shrink-0">
                 <button
@@ -915,7 +915,7 @@ export default function AgentWorkspace() {
                 </button>
               </div>
             </form>
-            <div className="flex items-center justify-between text-[10px] text-zinc-500 mt-1 px-0.5">
+            <div className="flex items-center justify-between text-[10px] text-zinc-400 dark:text-zinc-500 mt-1 px-0.5">
               <span>Enter to send • Shift+Enter for newline</span>
               <span>{selectedChannels.length} active channels</span>
             </div>
@@ -925,14 +925,14 @@ export default function AgentWorkspace() {
         {/* ========================================================= */}
         {/* RIGHT SIDEBAR: Chat History (w-[230px])                   */}
         {/* ========================================================= */}
-        <aside className="w-[230px] min-w-[230px] max-w-[230px] h-full bg-[#161515] flex flex-col shrink-0 select-none overflow-hidden">
+        <aside className="w-[230px] min-w-[230px] max-w-[230px] h-full bg-white dark:bg-[#161515] flex flex-col shrink-0 select-none overflow-hidden transition-colors">
           <div className="p-3.5 flex flex-col h-full min-h-0 overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between mb-3 shrink-0">
-              <h2 className="text-xs font-bold text-zinc-300 uppercase tracking-wider">
+              <h2 className="text-xs font-bold text-zinc-600 dark:text-zinc-300 uppercase tracking-wider">
                 History
               </h2>
-              <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-[#201f1f] text-zinc-400 border border-[#252525]">
+              <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-100 dark:bg-[#201f1f] text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-[#252525]">
                 {threads.length} {threads.length === 1 ? "chat" : "chats"}
               </span>
             </div>
@@ -959,14 +959,14 @@ export default function AgentWorkspace() {
                     onClick={() => handleSelectThread(thread.id)}
                     className={`group px-2.5 py-1.5 rounded-md cursor-pointer transition-colors flex items-center justify-between text-xs border ${
                       isActive
-                        ? "bg-[#201f1f] text-white font-medium border-[#2e2d2d]"
-                        : "bg-transparent text-zinc-400 hover:bg-[#1a1919] hover:text-zinc-200 border-transparent"
+                        ? "bg-zinc-100 dark:bg-[#201f1f] text-zinc-900 dark:text-white font-medium border-zinc-300 dark:border-[#2e2d2d]"
+                        : "bg-transparent text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-[#1a1919] hover:text-zinc-900 dark:hover:text-zinc-200 border-transparent"
                     }`}
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       <FiMessageSquare 
                         size={12} 
-                        className={`shrink-0 ${isActive ? "text-[#8c66ff]" : "text-zinc-500"}`} 
+                        className={`shrink-0 ${isActive ? "text-[#612bd3] dark:text-[#8c66ff]" : "text-zinc-400 dark:text-zinc-500"}`} 
                       />
                       <span className="text-xs truncate">
                         {thread.title}
@@ -977,7 +977,7 @@ export default function AgentWorkspace() {
                       <button
                         type="button"
                         onClick={(e) => handleDeleteThread(e, thread.id)}
-                        className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-red-500/20 text-zinc-500 hover:text-red-400 transition-colors cursor-pointer shrink-0"
+                        className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-red-500/10 text-zinc-400 hover:text-red-500 transition-colors cursor-pointer shrink-0"
                         title="Delete Thread"
                       >
                         <FiTrash2 size={11} />

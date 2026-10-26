@@ -427,22 +427,22 @@ export default function PostComposerModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/70 backdrop-blur-sm overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 dark:bg-black/80 backdrop-blur-sm overflow-hidden">
       <div 
-        className="relative w-full max-w-5xl bg-zinc-950 border border-zinc-800 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[88vh]"
+        className="relative w-full max-w-5xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh] text-slate-900 dark:text-white transition-colors"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Top Bar */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-800 bg-zinc-950">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-md bg-blue-600 text-white font-black text-sm flex items-center justify-center shadow-md shadow-blue-600/30">
+            <div className="w-8 h-8 rounded-md bg-[#612bd3] text-white font-black text-sm flex items-center justify-center shadow-md shadow-[#612bd3]/30">
               P
             </div>
             <div>
-              <h3 className="text-sm sm:text-base font-black text-white tracking-wide uppercase">
+              <h3 className="text-sm sm:text-base font-black text-slate-900 dark:text-white tracking-wide uppercase">
                 {initialPost ? "EDIT SCHEDULED POST" : "COMPOSE & SCHEDULE POST"}
               </h3>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-zinc-600 dark:text-zinc-400">
                 Multi-channel scheduling with real-time feed preview
               </p>
             </div>
@@ -454,16 +454,16 @@ export default function PostComposerModal({
               className={`px-3 py-1 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer border ${
                 aiWriterOpen
                   ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-violet-400/40 shadow-md shadow-violet-500/30"
-                  : "bg-gradient-to-r from-violet-600/15 to-indigo-600/15 text-violet-300 border-violet-500/30 hover:border-violet-500/60 hover:text-white"
+                  : "bg-gradient-to-r from-violet-600/15 to-indigo-600/15 text-violet-700 dark:text-violet-300 border-violet-500/30 hover:border-violet-500/60 hover:text-[#612bd3] dark:hover:text-white"
               }`}
             >
-              <FaMagic className="text-[10px] text-amber-300" />
+              <FaMagic className="text-[10px] text-amber-500 dark:text-amber-300" />
               <span>Write with AI</span>
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="w-7 h-7 rounded-md hover:bg-zinc-900 text-zinc-400 hover:text-zinc-200 flex items-center justify-center transition-colors cursor-pointer"
+              className="w-7 h-7 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 flex items-center justify-center transition-colors cursor-pointer"
             >
               <FiX className="text-sm" />
             </button>
@@ -471,7 +471,7 @@ export default function PostComposerModal({
         </div>
 
         {/* Modal Main Content - 2 Column Split */}
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-zinc-800">
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-zinc-200 dark:divide-zinc-800 bg-[#f8f9fa] dark:bg-zinc-950">
           {/* LEFT COLUMN: Composer Form (7 cols) */}
           <div className="lg:col-span-7 p-5 space-y-4 overflow-y-auto overflow-x-hidden max-h-[calc(88vh-110px)]">
             {/* AI Post Writer Assistant (Collapsible) */}
@@ -1072,11 +1072,11 @@ export default function PostComposerModal({
         </div>
 
         {/* Modal Bottom Bar / Actions */}
-        <div className="flex items-center justify-between px-5 py-3 border-t border-zinc-800 bg-zinc-950">
+        <div className="flex items-center justify-between px-5 py-3 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
           <button
             type="button"
             onClick={onClose}
-            className="px-3.5 py-1.5 rounded-md text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors cursor-pointer"
+            className="px-3.5 py-1.5 rounded-md text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors cursor-pointer"
           >
             Cancel
           </button>
@@ -1086,7 +1086,7 @@ export default function PostComposerModal({
               type="button"
               disabled={submitting}
               onClick={() => handleSubmit("draft")}
-              className="px-3.5 py-1.5 rounded-md text-xs font-bold text-zinc-300 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 transition-colors cursor-pointer"
+              className="px-3.5 py-1.5 rounded-md text-xs font-bold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 transition-colors cursor-pointer"
             >
               Save as Draft
             </button>
@@ -1097,7 +1097,7 @@ export default function PostComposerModal({
                   type="button"
                   disabled={submitting}
                   onClick={() => handleSubmit(null, true)}
-                  className="px-3.5 py-1.5 rounded-md text-xs font-bold text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 transition-colors cursor-pointer flex items-center gap-1.5"
+                  className="px-3.5 py-1.5 rounded-md text-xs font-bold text-zinc-700 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 transition-colors cursor-pointer flex items-center gap-1.5"
                 >
                   <FiSend className="text-xs text-blue-400" />
                   <span>Publish Now Instead</span>

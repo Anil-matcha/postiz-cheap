@@ -1,26 +1,61 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: var(--font-inter), sans-serif;
   --font-outfit: var(--font-inter), sans-serif;
   
-  --color-bg-page: #0e0e0e;
-  --color-bg-card: #1a1919;
-  --color-bg-card-hover: #201f1f;
-  --color-bg-elevated: #242323;
-  --color-divider: #252525;
   --color-primary: #612bd3;
   --color-primary-hover: #7237e8;
   --color-ai-btn: #d82d7e;
-  --color-primary-text: #ffffff;
-  --color-secondary-text: #999999;
-  --color-primary-btn-text: #ffffff;
+  
+  --color-bg-page: var(--bg-page);
+  --color-bg-shell: var(--bg-shell);
+  --color-bg-card: var(--bg-card);
+  --color-bg-card-hover: var(--bg-card-hover);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-divider: var(--bg-divider);
+  --color-primary-text: var(--text-primary);
+  --color-secondary-text: var(--text-secondary);
 }
 
 @layer base {
+  :root {
+    --bg-page: #f1f2f5;
+    --bg-shell: #ffffff;
+    --bg-frame: #e5e7eb;
+    --bg-main: #f8f9fa;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f3f4f6;
+    --bg-elevated: #ffffff;
+    --bg-divider: #e5e7eb;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --scrollbar-track: #f1f2f5;
+    --scrollbar-thumb: #cbd5e1;
+    --scrollbar-thumb-hover: #94a3b8;
+  }
+
+  .dark {
+    --bg-page: #0e0e0e;
+    --bg-shell: #1a1919;
+    --bg-frame: #212121;
+    --bg-main: #141414;
+    --bg-card: #1a1919;
+    --bg-card-hover: #201f1f;
+    --bg-elevated: #242323;
+    --bg-divider: #252525;
+    --text-primary: #ffffff;
+    --text-secondary: #999999;
+    --scrollbar-track: #09090b;
+    --scrollbar-thumb: #27272a;
+    --scrollbar-thumb-hover: #3f3f46;
+  }
+
   html, body {
-    background-color: #0e0e0e;
-    color: #ffffff;
+    background-color: var(--bg-page);
+    color: var(--text-primary);
     font-family: var(--font-sans);
     height: 100%;
     width: 100%;
@@ -29,42 +64,60 @@
     overflow: hidden;
   }
 
-  /* Minimal Dark Scrollbar */
+  /* Minimal Scrollbar */
   ::-webkit-scrollbar {
     width: 5px;
     height: 5px;
   }
 
   ::-webkit-scrollbar-track {
-    background: #09090b;
+    background: var(--scrollbar-track);
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #27272a;
+    background: var(--scrollbar-thumb);
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #3f3f46;
+    background: var(--scrollbar-thumb-hover);
   }
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: #27272a #09090b;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   }
 }
 
 /* Minimal Utilities */
 .glass-panel {
-  background: rgba(9, 9, 11, 0.85);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--bg-divider);
+}
+
+.dark .glass-panel {
+  background: rgba(9, 9, 11, 0.85);
   border: 1px solid #27272a;
 }
 
 .glass-dropdown {
-  background: #121215;
-  border: 1px solid #27272a;
+  background: var(--bg-shell);
+  border: 1px solid var(--bg-divider);
+}
+
+.card-premium {
+  background-color: var(--bg-card);
+  border: 1px solid var(--bg-divider);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.dark .card-premium {
+  background-color: #1a1919;
+  border-color: #252525;
+  box-shadow: none;
 }
 
 .scrollbar-subtle::-webkit-scrollbar {
@@ -77,11 +130,10 @@
 }
 
 .scrollbar-subtle::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: var(--scrollbar-thumb);
   border-radius: 4px;
 }
 
 .scrollbar-subtle::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: var(--scrollbar-thumb-hover);
 }
-

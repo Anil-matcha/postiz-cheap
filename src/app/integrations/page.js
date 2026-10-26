@@ -293,28 +293,28 @@ export default function IntegrationsPage() {
     );
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-8 sm:px-6">
+    <div className="w-full max-w-7xl mx-auto px-4 py-8 sm:px-6 text-slate-900 dark:text-white transition-colors duration-200">
       
       {/* Connect Platform Modal */}
       {connectingPlatform && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-          <div className="card-premium p-6 w-full max-w-sm flex flex-col gap-4">
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-              <h3 className="font-bold text-sm text-white flex items-center gap-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm px-4">
+          <div className="bg-white dark:bg-[#1a1919] border border-zinc-200 dark:border-[#2e2d2d] rounded-2xl shadow-2xl p-6 w-full max-w-sm flex flex-col gap-4 text-slate-900 dark:text-white">
+            <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3">
+              <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
                 {connectingPlatform.Icon && <connectingPlatform.Icon className={connectingPlatform.iconColor} />}
                 Connect {connectingPlatform.name}
               </h3>
               <button
                 onClick={() => setConnectingPlatform(null)}
-                className="text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                className="text-zinc-400 hover:text-zinc-700 dark:hover:text-white transition-colors cursor-pointer"
               >
                 <FiX className="text-sm" />
               </button>
             </div>
             
             <div className="flex flex-col gap-2">
-              <label className="text-xs text-zinc-400 font-medium">
-                Account label <span className="text-zinc-500">(optional)</span>
+              <label className="text-xs text-zinc-600 dark:text-zinc-400 font-medium">
+                Account label <span className="text-zinc-400 dark:text-zinc-500">(optional)</span>
               </label>
               <input
                 autoFocus
@@ -323,23 +323,23 @@ export default function IntegrationsPage() {
                 value={accountNameInput}
                 onChange={(e) => setAccountNameInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && confirmConnect()}
-                className="px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-xs outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/20 transition-all"
+                className="px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-lg text-slate-900 dark:text-white text-xs outline-none focus:border-[#612bd3] focus:ring-1 focus:ring-[#612bd3]/20 transition-all"
               />
               <p className="text-[10px] text-zinc-500 leading-normal">
                 A friendly name to identify this account in the scheduler. You can change this later.
               </p>
             </div>
 
-            <div className="flex gap-2 justify-end border-t border-zinc-800 pt-4 mt-1">
+            <div className="flex gap-2 justify-end border-t border-zinc-200 dark:border-zinc-800 pt-4 mt-1">
               <button
                 onClick={() => setConnectingPlatform(null)}
-                className="px-4 py-2 rounded-lg text-xs text-zinc-400 hover:text-white border border-zinc-800 transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-lg text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-300 dark:border-zinc-800 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmConnect}
-                className="px-4 py-2 rounded-lg text-xs bg-violet-500 hover:bg-violet-600 text-white font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2 rounded-lg text-xs bg-[#612bd3] hover:bg-[#7237e8] text-white font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shadow-md shadow-[#612bd3]/30"
               >
                 Connect with {connectingPlatform.name}
               </button>
@@ -351,46 +351,38 @@ export default function IntegrationsPage() {
       <div className="mx-auto max-w-4xl flex flex-col gap-8">
         
         {/* Header */}
-        <div className="flex flex-col gap-2 w-full border-b border-zinc-900 pb-6">
+        <div className="flex flex-col gap-2 w-full border-b border-zinc-200 dark:border-zinc-900 pb-6">
           <div className="flex items-center justify-between gap-4">
-            <h1 className="text-3xl font-bold tracking-tight text-white">Integrations</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Integrations</h1>
             {session?.user && (
               <button
                 onClick={fetchAccounts}
                 disabled={loading}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-800 hover:border-zinc-700 bg-zinc-900 text-zinc-300 hover:text-white text-xs font-semibold transition-all disabled:opacity-50 cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white text-xs font-semibold transition-all disabled:opacity-50 cursor-pointer shadow-xs"
               >
                 <FiRefreshCw className={loading ? "animate-spin" : ""} />
                 Refresh
               </button>
             )}
           </div>
-          <p className="text-xs text-zinc-400">
-            Connect your social media accounts to publish content directly from MuAPI.
+          <p className="text-xs text-zinc-600 dark:text-zinc-400">
+            Connect your social media accounts to publish content directly.
           </p>
-          <a
-            href="https://muapi.ai/docs/social-publishing#social-publishing"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="self-start text-xs text-violet-400 hover:underline font-semibold mt-1"
-          >
-            Add social media scheduling to your apps →
-          </a>
         </div>
 
         {/* Guest Warning alert */}
         {!session?.user && (
-          <div className="bg-amber-500/5 border border-amber-500/20 rounded-lg p-4 flex items-center justify-between gap-4">
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <FiAlertTriangle className="text-amber-500 text-lg shrink-0" />
               <div className="flex flex-col gap-0.5">
-                <span className="text-xs font-bold text-amber-500">Sign in required</span>
-                <span className="text-[11px] text-zinc-400">Connect your channels to schedule posts by logging in.</span>
+                <span className="text-xs font-bold text-amber-600 dark:text-amber-400">Sign in required</span>
+                <span className="text-[11px] text-zinc-600 dark:text-zinc-400">Connect your channels to schedule posts by logging in.</span>
               </div>
             </div>
             <button
               onClick={() => signIn("google")}
-              className="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold text-[11px] rounded-lg transition-colors"
+              className="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-[11px] rounded-lg transition-colors cursor-pointer"
             >
               Sign In
             </button>
@@ -398,7 +390,7 @@ export default function IntegrationsPage() {
         )}
 
         {/* Platforms list */}
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
           {PLATFORMS.map((platform) => {
             const { key, platformId, name, Icon, iconColor, description, comingSoon, requestAccess } = platform;
             const connected = getAccountsForPlatform(platformId, key);
@@ -406,23 +398,23 @@ export default function IntegrationsPage() {
             const requestCount = interestCounts[name] || 0;
 
             return (
-              <div key={key} className="card-premium p-6 flex flex-col gap-5">
+              <div key={key} className="bg-white dark:bg-[#1a1919] border border-zinc-200 dark:border-[#252525] rounded-xl p-5 flex flex-col gap-4 shadow-xs dark:shadow-none transition-colors">
                 {/* Platform main row */}
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0">
+                    <div className="h-10 w-10 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center shrink-0">
                       <Icon className={`text-xl ${iconColor}`} />
                     </div>
                     <div className="flex flex-col">
-                      <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
                         {name}
                         {comingSoon && (
-                          <span className="text-[9px] font-semibold bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded-full border border-amber-500/20">
+                          <span className="text-[9px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/20">
                             Coming soon
                           </span>
                         )}
                       </h3>
-                      <p className="text-[11px] text-zinc-400 mt-0.5">{description}</p>
+                      <p className="text-[11px] text-zinc-600 dark:text-zinc-400 mt-0.5">{description}</p>
                     </div>
                   </div>
 
@@ -430,7 +422,7 @@ export default function IntegrationsPage() {
                     <button
                       onClick={() => handleConnect(platform)}
                       disabled={!session}
-                      className="px-3.5 py-2 bg-zinc-100 hover:bg-white disabled:opacity-50 text-zinc-950 text-xs font-semibold rounded-lg shadow-md transition-colors flex items-center gap-1 cursor-pointer"
+                      className="px-3.5 py-1.5 bg-[#612bd3] hover:bg-[#7237e8] disabled:opacity-50 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer"
                     >
                       <FiPlus /> Connect
                     </button>
@@ -441,8 +433,8 @@ export default function IntegrationsPage() {
                         disabled={requesting === key}
                         className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors cursor-pointer disabled:opacity-50 ${
                           requested
-                            ? "bg-green-500/5 border-green-500/20 text-green-400"
-                            : "bg-zinc-900 border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white"
+                            ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                            : "bg-zinc-100 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white"
                         }`}
                       >
                         {requested ? (
@@ -459,12 +451,12 @@ export default function IntegrationsPage() {
 
                 {/* Account list section */}
                 {!comingSoon && session && (
-                  <div className="border-t border-zinc-900 pt-4 flex flex-col gap-2">
+                  <div className="border-t border-zinc-200 dark:border-[#252525] pt-3 flex flex-col gap-2">
                     {loading ? (
-                      <div className="h-10 w-full bg-zinc-900/60 rounded-lg animate-pulse" />
+                      <div className="h-10 w-full bg-zinc-100 dark:bg-zinc-900/60 rounded-lg animate-pulse" />
                     ) : connected.length > 0 ? (
                       connected.map((acc) => (
-                        <div key={acc.id} className="bg-zinc-900/50 rounded-lg px-4 py-3 border border-zinc-900 flex items-center justify-between gap-3">
+                        <div key={acc.id} className="bg-zinc-50 dark:bg-zinc-900/50 rounded-lg px-4 py-2.5 border border-zinc-200 dark:border-zinc-800 flex items-center justify-between gap-3">
                           <div className="flex items-center gap-2 truncate">
                             {renamingId === acc.id ? (
                               <input
@@ -475,10 +467,10 @@ export default function IntegrationsPage() {
                                   if (e.key === "Enter") saveRename(acc.id);
                                   if (e.key === "Escape") setRenamingId(null);
                                 }}
-                                className="px-2 py-0.5 text-xs bg-zinc-950 border border-violet-500 rounded outline-none text-white w-44"
+                                className="px-2 py-0.5 text-xs bg-white dark:bg-zinc-950 border border-[#612bd3] rounded outline-none text-slate-900 dark:text-white w-44"
                               />
                             ) : (
-                              <span className="text-xs font-semibold text-zinc-200 truncate">
+                              <span className="text-xs font-semibold text-slate-800 dark:text-zinc-200 truncate">
                                 {acc.account_name || `${name} Account`}
                               </span>
                             )}
@@ -490,7 +482,7 @@ export default function IntegrationsPage() {
                               <>
                                 <button
                                   onClick={() => saveRename(acc.id)}
-                                  className="p-1.5 text-green-400 hover:bg-green-400/10 rounded transition-colors cursor-pointer"
+                                  className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 rounded transition-colors cursor-pointer"
                                   title="Save"
                                 >
                                   <FiCheck className="text-sm" />
@@ -507,7 +499,7 @@ export default function IntegrationsPage() {
                               <>
                                 <button
                                   onClick={() => startRename(acc)}
-                                  className="p-1.5 text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 rounded transition-colors cursor-pointer"
+                                  className="p-1.5 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200/60 dark:hover:bg-zinc-800 rounded transition-colors cursor-pointer"
                                   title="Rename"
                                 >
                                   <FiEdit2 className="text-xs" />
@@ -515,7 +507,7 @@ export default function IntegrationsPage() {
                                 <button
                                   onClick={() => handleDisconnect(acc.id)}
                                   disabled={disconnectingId === acc.id}
-                                  className="p-1.5 text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded transition-colors disabled:opacity-50 cursor-pointer"
+                                  className="p-1.5 text-zinc-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-500/10 rounded transition-colors disabled:opacity-50 cursor-pointer"
                                   title="Disconnect"
                                 >
                                   <FiTrash2 className="text-xs" />
