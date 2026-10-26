@@ -4,22 +4,23 @@
   --font-sans: var(--font-inter), sans-serif;
   --font-outfit: var(--font-inter), sans-serif;
   
-  --color-bg-page: #09090b;
-  --color-bg-card: #121215;
-  --color-bg-card-hover: #18181b;
-  --color-bg-elevated: #1c1c20;
-  --color-divider: #27272a;
-  --color-primary: #3b82f6;
-  --color-primary-hover: #2563eb;
-  --color-primary-text: #f4f4f5;
-  --color-secondary-text: #a1a1aa;
-  --color-primary-btn-text: #09090b;
+  --color-bg-page: #0e0e0e;
+  --color-bg-card: #1a1919;
+  --color-bg-card-hover: #201f1f;
+  --color-bg-elevated: #242323;
+  --color-divider: #252525;
+  --color-primary: #612bd3;
+  --color-primary-hover: #7237e8;
+  --color-ai-btn: #d82d7e;
+  --color-primary-text: #ffffff;
+  --color-secondary-text: #999999;
+  --color-primary-btn-text: #ffffff;
 }
 
 @layer base {
   html, body {
-    background-color: #09090b;
-    color: #f4f4f5;
+    background-color: #0e0e0e;
+    color: #ffffff;
     font-family: var(--font-sans);
     min-height: 100%;
     margin: 0;

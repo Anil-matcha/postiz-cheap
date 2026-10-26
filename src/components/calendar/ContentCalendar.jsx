@@ -212,16 +212,16 @@ export default function ContentCalendar({
   };
 
   return (
-    <div className="flex flex-col bg-zinc-950 border border-zinc-800/80 rounded-lg overflow-hidden shadow-sm">
+    <div className="flex flex-col bg-[#1a1919] border border-[#252525] rounded-[14px] overflow-hidden shadow-xl">
       {/* Calendar Header & Minimal Toolbar */}
-      <div className="p-3.5 sm:p-4 border-b border-zinc-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-900/30">
+      <div className="p-3.5 sm:p-4 border-b border-[#252525] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#161515]">
         {/* Left: Date Navigation */}
         <div className="flex items-center gap-2.5">
-          <div className="flex items-center bg-zinc-900 p-0.5 rounded-lg border border-zinc-800 text-xs">
+          <div className="flex items-center bg-[#201f1f] p-0.5 rounded-lg border border-[#2a2929] text-xs">
             <button
               type="button"
               onClick={prevPeriod}
-              className="p-1.5 rounded text-zinc-400 hover:text-white transition-colors cursor-pointer"
+              className="p-1.5 rounded text-[#999999] hover:text-white transition-colors cursor-pointer"
               title="Previous"
             >
               <FaChevronLeft className="text-[10px]" />
@@ -229,21 +229,21 @@ export default function ContentCalendar({
             <button
               type="button"
               onClick={jumpToToday}
-              className="px-2.5 py-1 rounded text-xs font-medium text-zinc-300 hover:text-white transition-colors cursor-pointer"
+              className="px-2.5 py-1 rounded text-xs font-semibold text-zinc-200 hover:text-white transition-colors cursor-pointer"
             >
               Today
             </button>
             <button
               type="button"
               onClick={nextPeriod}
-              className="p-1.5 rounded text-zinc-400 hover:text-white transition-colors cursor-pointer"
+              className="p-1.5 rounded text-[#999999] hover:text-white transition-colors cursor-pointer"
               title="Next"
             >
               <FaChevronRight className="text-[10px]" />
             </button>
           </div>
 
-          <h2 className="text-sm sm:text-base font-black text-white uppercase tracking-wider">
+          <h2 className="text-sm sm:text-base font-bold text-white tracking-wide">
             {monthName}
           </h2>
         </div>
@@ -251,7 +251,7 @@ export default function ContentCalendar({
         {/* Right: Filters & View Toggle */}
         <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap justify-between sm:justify-end">
           {/* Platform Filter Pills */}
-          <div className="flex items-center gap-1 bg-zinc-900/90 p-1 rounded-lg border border-zinc-800 text-xs">
+          <div className="flex items-center gap-1 bg-[#141414] p-1 rounded-lg border border-[#252525] text-xs">
             {["all", "youtube", "tiktok", "instagram", "x_twitter", "facebook", "linkedin", "threads", "pinterest"].map((platKey) => {
               const isActive = platformFilter === platKey;
               const plat = PLATFORM_CONFIG[platKey];
@@ -264,9 +264,9 @@ export default function ContentCalendar({
                   className={`px-2 py-1 rounded-md text-[11px] font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
                     isActive
                       ? platKey === "all"
-                        ? "bg-zinc-800 text-white font-bold shadow-sm"
-                        : plat?.activePill || "bg-zinc-800 text-white"
-                      : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+                        ? "bg-[#612bd3] text-white font-bold shadow-sm shadow-[#612bd3]/30"
+                        : plat?.activePill || "bg-[#612bd3] text-white"
+                      : "text-[#999999] hover:text-zinc-200 hover:bg-[#201f1f]"
                   }`}
                 >
                   {Icon && <Icon className={`text-[11px] ${isActive ? "text-current" : plat.color}`} />}
@@ -277,14 +277,14 @@ export default function ContentCalendar({
           </div>
 
           {/* View Mode (Month / Week) */}
-          <div className="flex items-center bg-zinc-900/90 p-1 rounded-lg border border-zinc-800 text-xs">
+          <div className="flex items-center bg-[#141414] p-1 rounded-lg border border-[#252525] text-xs">
             <button
               type="button"
               onClick={() => setViewMode("month")}
               className={`px-3 py-1 rounded-md text-xs font-bold transition-all cursor-pointer ${
                 viewMode === "month" 
-                  ? "bg-blue-600 text-white shadow-sm shadow-blue-600/30 font-bold" 
-                  : "text-zinc-400 hover:text-white"
+                  ? "bg-[#612bd3] text-white shadow-sm shadow-[#612bd3]/30 font-bold" 
+                  : "text-[#999999] hover:text-white"
               }`}
             >
               Month
@@ -294,8 +294,8 @@ export default function ContentCalendar({
               onClick={() => setViewMode("week")}
               className={`px-3 py-1 rounded-md text-xs font-bold transition-all cursor-pointer ${
                 viewMode === "week" 
-                  ? "bg-blue-600 text-white shadow-sm shadow-blue-600/30 font-bold" 
-                  : "text-zinc-400 hover:text-white"
+                  ? "bg-[#612bd3] text-white shadow-sm shadow-[#612bd3]/30 font-bold" 
+                  : "text-[#999999] hover:text-white"
               }`}
             >
               Week
@@ -307,10 +307,10 @@ export default function ContentCalendar({
             <button
               type="button"
               onClick={onNewPostClick}
-              className="px-3.5 py-1.5 rounded-lg text-xs font-extrabold text-white bg-blue-600 hover:bg-blue-500 transition-all cursor-pointer flex items-center gap-1.5 shadow-md shadow-blue-600/40 active:scale-95"
+              className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-[#612bd3] hover:bg-[#7237e8] transition-all cursor-pointer flex items-center gap-1.5 shadow-md shadow-[#612bd3]/40 active:scale-95"
             >
               <FaPlus className="text-[10px]" />
-              <span>NEW POST</span>
+              <span>New Post</span>
             </button>
           )}
         </div>
@@ -320,7 +320,7 @@ export default function ContentCalendar({
       {viewMode === "month" && (
         <div className="flex flex-col">
           {/* Day of Week Header */}
-          <div className="grid grid-cols-7 border-b border-zinc-800/60 bg-zinc-900/50 text-center py-2.5 text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+          <div className="grid grid-cols-7 border-b border-[#252525] bg-[#161515] text-center py-2.5 text-[11px] font-bold text-[#999999] uppercase tracking-wider">
             <span>MON</span>
             <span>TUE</span>
             <span>WED</span>
@@ -331,7 +331,7 @@ export default function ContentCalendar({
           </div>
 
           {/* Calendar Grid */}
-          <div className="grid grid-cols-7 divide-x divide-y divide-zinc-800/60 bg-zinc-950">
+          <div className="grid grid-cols-7 divide-x divide-y divide-[#252525] bg-[#141414]">
             {calendarDays.map((item, idx) => {
               const dayPosts = getPostsForDay(item.date);
               const isToday = isSameDay(item.date, today);
@@ -342,19 +342,19 @@ export default function ContentCalendar({
                   onClick={() => onDateClick(item.date)}
                   className={`min-h-[105px] sm:min-h-[120px] p-2 flex flex-col justify-between group transition-colors cursor-pointer relative ${
                     item.isCurrentMonth
-                      ? "bg-transparent hover:bg-zinc-900/50"
-                      : "bg-zinc-950/80 text-zinc-600 hover:bg-zinc-900/30"
-                  } ${isToday ? "ring-1 ring-inset ring-indigo-500/40 bg-indigo-500/[0.04]" : ""}`}
+                      ? "bg-transparent hover:bg-[#1a1919]"
+                      : "bg-[#0e0e0e]/80 text-[#666666] hover:bg-[#1a1919]/50"
+                  } ${isToday ? "ring-1 ring-inset ring-[#612bd3]/60 bg-[#612bd3]/[0.08]" : ""}`}
                 >
                   {/* Top Bar inside Date Cell */}
                   <div className="flex items-center justify-between mb-1">
                     <span
                       className={`text-xs w-5 h-5 flex items-center justify-center rounded-full ${
                         isToday
-                          ? "bg-indigo-600 text-white font-bold shadow-md shadow-indigo-500/40"
+                          ? "bg-[#612bd3] text-white font-bold shadow-md shadow-[#612bd3]/40"
                           : item.isCurrentMonth
                           ? "text-zinc-300 font-medium"
-                          : "text-zinc-600"
+                          : "text-[#666666]"
                       }`}
                     >
                       {item.date.getDate()}
@@ -367,7 +367,7 @@ export default function ContentCalendar({
                         e.stopPropagation();
                         onDateClick(item.date);
                       }}
-                      className="opacity-0 group-hover:opacity-100 w-4 h-4 rounded bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-sm"
+                      className="opacity-0 group-hover:opacity-100 w-4 h-4 rounded bg-[#612bd3]/30 hover:bg-[#612bd3] text-[#8c66ff] hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-sm"
                       title="Add post for this day"
                     >
                       <FaPlus className="text-[8px]" />
