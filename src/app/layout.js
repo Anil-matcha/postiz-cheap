@@ -16,8 +16,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="dark min-h-screen w-full">
-      <body className={`${inter.variable} ${inter.className} min-h-screen w-full antialiased bg-[#0e0e0e] text-white overflow-x-hidden`}>
+    <html lang="en" className="dark h-full w-full overflow-hidden">
+      <body className={`${inter.variable} ${inter.className} h-full w-full antialiased bg-[#0e0e0e] text-white overflow-hidden`}>
         <Providers>
           <AppShell>
             {children}

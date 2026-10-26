@@ -135,7 +135,7 @@ export default function AppShell({ children }) {
   const credits = session?.user?.credits ?? 10;
 
   return (
-    <div className="flex flex-col min-h-screen w-full bg-[#0e0e0e] text-[#ffffff] p-[10px] sm:p-[12px] select-none font-sans overflow-x-hidden">
+    <div className="flex h-screen w-screen bg-[#0e0e0e] text-[#ffffff] p-2 sm:p-2.5 font-sans overflow-hidden select-none">
       {/* Mobile Backdrop */}
       {mobileMenuOpen && (
         <div
@@ -144,25 +144,25 @@ export default function AppShell({ children }) {
         />
       )}
 
-      <div className="flex-1 flex gap-[10px] w-full min-h-[calc(100vh-24px)]">
+      <div className="flex gap-2 sm:gap-2.5 w-full h-full min-h-0 overflow-hidden">
         {/* Left Navigation Rail */}
         <aside
-          className={`fixed md:static inset-y-0 left-0 z-50 md:z-auto flex flex-col justify-between items-center w-[76px] bg-[#1a1919] border border-[#252525] md:rounded-[14px] py-4 transition-transform duration-200 ${
+          className={`fixed md:static inset-y-0 left-0 z-50 md:z-auto flex flex-col justify-between items-center w-[74px] h-full shrink-0 bg-[#1a1919] border border-[#252525] rounded-[14px] py-3.5 transition-transform duration-200 overflow-hidden ${
             mobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
           }`}
         >
-          {/* Top Logo */}
-          <div className="flex flex-col items-center gap-6 w-full">
+          {/* Top Logo & Menu Items */}
+          <div className="flex flex-col items-center gap-4 w-full min-h-0 overflow-y-auto scrollbar-none">
             <Link
               href="/"
-              className="flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
+              className="flex items-center justify-center transition-transform hover:scale-105 active:scale-95 shrink-0"
               title="Social Media Studio"
             >
-              <StudioBrandLogo className="w-10 h-10 drop-shadow-[0_4px_12px_rgba(97,43,211,0.35)]" />
+              <StudioBrandLogo className="w-9 h-9 drop-shadow-[0_4px_12px_rgba(97,43,211,0.35)]" />
             </Link>
 
             {/* Menu Items */}
-            <nav className="flex flex-col gap-2 w-full px-2">
+            <nav className="flex flex-col gap-1 w-full px-1.5">
               {navItems.map((item) => {
                 const isActive = item.exact
                   ? pathname === item.path
@@ -173,7 +173,7 @@ export default function AppShell({ children }) {
                     key={item.name}
                     href={item.path}
                     title={item.name}
-                    className={`relative group w-full py-2.5 px-1.5 flex flex-col items-center justify-center rounded-[10px] transition-all ${
+                    className={`relative group w-full py-2 px-1 flex flex-col items-center justify-center rounded-[10px] transition-all ${
                       isActive
                         ? "bg-[#612bd3]/15 text-[#8c66ff] border border-[#612bd3]/30 font-bold shadow-sm shadow-[#612bd3]/20"
                         : "text-[#999999] hover:text-white hover:bg-[#242323]"
@@ -183,7 +183,7 @@ export default function AppShell({ children }) {
                     <div className="transition-transform group-hover:scale-110">
                       {item.icon}
                     </div>
-                    <span className="text-[10px] tracking-tight mt-1 font-medium">
+                    <span className="text-[10px] tracking-tight mt-1 font-medium leading-none">
                       {item.name}
                     </span>
                   </Link>
@@ -193,7 +193,7 @@ export default function AppShell({ children }) {
           </div>
 
           {/* Bottom Profile / Auth */}
-          <div className="flex flex-col items-center gap-3 w-full px-2 pt-4 border-t border-[#252525]/60">
+          <div className="flex flex-col items-center gap-3 w-full px-2 pt-3 border-t border-[#252525]/60 shrink-0">
             {status === "authenticated" ? (
               <div className="relative flex flex-col items-center">
                 <button
@@ -251,9 +251,9 @@ export default function AppShell({ children }) {
         </aside>
 
         {/* Right Frame Container */}
-        <div className="flex-1 min-w-0 bg-[#212121] rounded-[14px] overflow-hidden flex flex-col gap-[1px]">
+        <div className="flex-1 min-w-0 h-full min-h-0 bg-[#212121] rounded-[14px] overflow-hidden flex flex-col">
           {/* Top Header Bar */}
-          <header className="flex bg-[#1a1919] h-[72px] px-4 sm:px-6 items-center justify-between gap-4 border-b border-[#252525]">
+          <header className="shrink-0 flex bg-[#1a1919] h-[64px] sm:h-[68px] px-4 sm:px-6 items-center justify-between gap-4 border-b border-[#252525]">
             {/* Left: Mobile Toggle & Page Title */}
             <div className="flex items-center gap-3 min-w-0">
               <button
@@ -266,7 +266,7 @@ export default function AppShell({ children }) {
 
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
-                  <h1 className="text-lg sm:text-[22px] font-bold tracking-tight text-white capitalize truncate">
+                  <h1 className="text-lg sm:text-[20px] font-bold tracking-tight text-white capitalize truncate">
                     {getPageTitle()}
                   </h1>
                   <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#612bd3]/15 border border-[#612bd3]/30 text-[#8c66ff] text-[10px] font-semibold">
@@ -310,7 +310,7 @@ export default function AppShell({ children }) {
             </div>
 
             {/* Right: Actions Section */}
-            <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               {/* Credits Chip */}
               <Link
                 href="/pricing"
@@ -346,7 +346,7 @@ export default function AppShell({ children }) {
           </header>
 
           {/* Main Workspace Body */}
-          <main className="flex-1 bg-[#141414] overflow-y-auto scrollbar-subtle">
+          <main className="flex-1 min-h-0 bg-[#141414] overflow-y-auto overflow-x-hidden scrollbar-subtle">
             {children}
           </main>
         </div>
