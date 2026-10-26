@@ -45,6 +45,7 @@ model User {
   sessions       Session[]
   scheduledPosts ScheduledPost[]
   postTags       PostTag[]
+  mediaAssets    MediaAsset[]
   AppInstance    AppInstance[]
   Creation       Creation[]
 }
@@ -95,6 +96,26 @@ model PostTag {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, name])
+}
+
+model MediaAsset {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  url         String   @db.Text
+  type        String   @default("image")
+  mimeType    String?
+  size        Int?
+  width       Int?
+  height      Int?
+  aspectRatio String?
+  folder      String   @default("All Media")
+  tags        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, folder])
 }
 
 model AppInstance {

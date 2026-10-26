@@ -103,7 +103,7 @@ export default function AppShell({ children }) {
     },
     {
       name: "Media",
-      path: "/gallery",
+      path: "/media",
       icon: <FiImage className="w-5 h-5" />,
     },
     {
@@ -118,7 +118,7 @@ export default function AppShell({ children }) {
     if (pathname.startsWith("/analytics")) return "Analytics & Performance";
     if (pathname.startsWith("/agents")) return "AI Social Agent";
     if (pathname.startsWith("/integrations")) return "Channels & Integrations";
-    if (pathname.startsWith("/gallery")) return "Media Library";
+    if (pathname.startsWith("/media") || pathname.startsWith("/gallery")) return "Media Asset Library";
     if (pathname.startsWith("/pricing")) return "Pricing & Credits";
     if (pathname.startsWith("/login")) return "Sign In";
     return "Creator Studio";
@@ -416,12 +416,12 @@ export default function AppShell({ children }) {
                 <span>Connected Channels</span>
               </Link>
               <Link
-                href="/gallery"
+                href="/media"
                 onClick={() => setProfileDropdownOpen(false)}
                 className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-zinc-600 dark:text-[#cccccc] hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-[#252424] transition-colors"
               >
                 <FiImage className="text-pink-500 dark:text-pink-400" />
-                <span>Media Library</span>
+                <span>Media Asset Library</span>
               </Link>
               <Link
                 href="/pricing"
