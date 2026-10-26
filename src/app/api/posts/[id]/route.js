@@ -19,6 +19,9 @@ export async function DELETE(req, { params }) {
       });
 
       if (post) {
+        if (post.userId !== session.user.id) {
+          return NextResponse.json({ error: "Post not found" }, { status: 404 });
+        }
         if (post.status === "processing") {
           return NextResponse.json({ error: "Cannot delete a post that is currently uploading." }, { status: 400 });
         }
@@ -56,6 +59,9 @@ export async function PATCH(req, { params }) {
       });
 
       if (post) {
+        if (post.userId !== session.user.id) {
+          return NextResponse.json({ error: "Post not found" }, { status: 404 });
+        }
         if (body.action === "publish_now" && post.status === "processing") {
           return NextResponse.json({ error: "Cannot publish a post that is currently uploading." }, { status: 400 });
         }

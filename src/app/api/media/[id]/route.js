@@ -12,6 +12,7 @@ export async function PATCH(req, { params }) {
     }
 
     const { id } = await params;
+    const userId = session.user.id;
     const body = await req.json();
     const { name, folder, tags } = body;
 
@@ -23,10 +24,19 @@ export async function PATCH(req, { params }) {
     let updatedAsset = null;
 
     try {
-      updatedAsset = await prisma.mediaAsset.update({
-        where: { id },
-        data: updateData,
-      });
+      const asset = await prisma.mediaAsset.findUnique({ where: { id } });
+
+      if (asset) {
+        if (asset.userId !== userId) {
+          return NextResponse.json({ error: "Media asset not found" }, { status: 404 });
+        }
+        updatedAsset = await prisma.mediaAsset.update({
+          where: { id },
+          data: updateData,
+        });
+      } else {
+        updatedAsset = MediaStore.update(id, updateData);
+      }
     } catch (e) {
       console.warn("[MEDIA_PATCH_DB_FALLBACK] Updating MediaStore:", e.message);
       updatedAsset = MediaStore.update(id, updateData);
@@ -51,11 +61,21 @@ export async function DELETE(req, { params }) {
     }
 
     const { id } = await params;
+    const userId = session.user.id;
 
     try {
-      await prisma.mediaAsset.delete({
-        where: { id },
-      });
+      const asset = await prisma.mediaAsset.findUnique({ where: { id } });
+
+      if (asset) {
+        if (asset.userId !== userId) {
+          return NextResponse.json({ error: "Media asset not found" }, { status: 404 });
+        }
+        await prisma.mediaAsset.delete({
+          where: { id },
+        });
+      } else {
+        MediaStore.delete(id);
+      }
     } catch (e) {
       console.warn("[MEDIA_DELETE_DB_FALLBACK] Deleting from MediaStore:", e.message);
       MediaStore.delete(id);
